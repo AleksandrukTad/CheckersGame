@@ -190,13 +190,13 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 458324851}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 10, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!1001 &838790494
 Prefab:
   m_ObjectHideFlags: 0
@@ -240,6 +240,10 @@ Prefab:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: a047d86d4dc4fa04dbde226095e7c5a0, type: 2}
+    - target: {fileID: 100000, guid: 5f16f397662267f429f1e865955a4d01, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 5f16f397662267f429f1e865955a4d01, type: 3}
   m_IsPrefabParent: 0
@@ -351,6 +355,18 @@ Prefab:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: a047d86d4dc4fa04dbde226095e7c5a0, type: 2}
+    - target: {fileID: 100000, guid: e1869ec545f9a9b43bc4524d638aee22, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: e1869ec545f9a9b43bc4524d638aee22, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2300000, guid: e1869ec545f9a9b43bc4524d638aee22, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: e1869ec545f9a9b43bc4524d638aee22, type: 3}
   m_IsPrefabParent: 0
@@ -374,3 +390,16 @@ MonoBehaviour:
   blackPiecePrefab: {fileID: 1692407594907002, guid: 52f8f3b18c52f5f469962056fbb47a07,
     type: 2}
   boardOffset: {x: -4, y: 0, z: -4}
+  pieceOffset: {x: 0.5, y: 0, z: 0.5}
+--- !u!65 &1244907720
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1244907715}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.08, y: 0.08, z: 0.001}
+  m_Center: {x: 0, y: 0, z: -0.0004999997}

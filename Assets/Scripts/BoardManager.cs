@@ -11,9 +11,62 @@ public class BoardManager : MonoBehaviour {
 	public Vector3 boardOffset = new Vector3(-4.0f, 0, -4.0f);
 	public Vector3 pieceOffset = new Vector3 (0.5f, 0, 0.5f);
 
+	private Piece selectedPiece;
+	private Vector2 startDrag;
+	private Vector2 endDrag;
+
+	private Vector2 mouseOver;
+
 	private void Start()
 	{
 		generateBoard ();
+	}
+
+	private void Update()
+	{
+		updateMouseOver ();
+
+		//If it is my turn
+		{
+			int x = (int)mouseOver.x;
+			int y = (int)mouseOver.y;
+
+			if (Input.GetMouseButtonDown (0))
+				selectPiece (x, y);
+			if (Input.GetMouseButtonUp (0))
+				TryMove ((int)startDrag.x, (int)startDrag.y, x, y);
+		}
+
+	}
+	private void TryMove(int x1, int y1, int x2, int y2){
+		//Mulitplayer support
+		startDrag = new Vector2 (x1, y1);
+		endDrag = new Vector2 (x2, y2);
+		selectedPiece = pieces [x1, y1];
+
+		movePiece (selectedPiece, x2, y2);
+	}
+	private void updateMouseOver(){
+		RaycastHit hit;
+		if (Physics.Raycast (Camera.main.ScreenPointToRay (Input.mousePosition), out hit, 25.0f, LayerMask.GetMask ("Board"))) {
+			mouseOver.x = (int)(hit.point.x - boardOffset.x);
+			mouseOver.y = (int)(hit.point.z - boardOffset.z);
+		} else {
+			mouseOver.x = -1;
+			mouseOver.y = -1;
+		}
+	}
+
+	private void selectPiece(int x, int y){
+		//Out of bounds
+		if (x < 0 || y < 0 || x > pieces.Length || y > pieces.Length)
+			return;
+		Piece p = pieces [x, y];
+		if (p != null) {
+			selectedPiece = p;
+			startDrag = mouseOver;
+		}
+		Debug.Log (selectedPiece.name);
 	}
 	private void generateBoard(){
 		//generate White team.
