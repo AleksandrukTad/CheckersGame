@@ -11,6 +11,10 @@ public class BoardManager : MonoBehaviour {
 	public Vector3 boardOffset = new Vector3(-4.0f, 0, -4.0f);
 	public Vector3 pieceOffset = new Vector3 (0.5f, 0, 0.5f);
 
+	private bool hasKilled;
+	private List<Piece> forcedPieces;
+	private bool whiteTurn;
+	public bool isWhite;
 	private Piece selectedPiece;
 	private Vector2 startDrag;
 	private Vector2 endDrag;
@@ -19,6 +23,8 @@ public class BoardManager : MonoBehaviour {
 
 	private void Start()
 	{
+		forcedPieces = new List<Piece> ();
+		whiteTurn = true;
 		generateBoard ();
 	}
 
@@ -31,6 +37,9 @@ public class BoardManager : MonoBehaviour {
 			int x = (int)mouseOver.x;
 			int y = (int)mouseOver.y;
 
+			if (selectedPiece != null)
+				updatePieceDrag (selectedPiece);
+
 			if (Input.GetMouseButtonDown (0))
 				selectPiece (x, y);
 			if (Input.GetMouseButtonUp (0))
@@ -38,13 +47,86 @@ public class BoardManager : MonoBehaviour {
 		}
 
 	}
+	private List<Piece> ScaneForPossibleMoves(){
+		forcedPieces = new List<Piece>();
+
+		//Checker all the picese
+		for (int i = 0; i < 8; i++) {
+			for (int j = 0; j < 8; j++) {
+				if (pieces [i, j] != null && pieces [i, j].isWhite == whiteTurn) {
+					if(pieces[i,j].isForcedToMove(pieces, i, j)){
+						forcedPieces.Add(pieces[i,j]);
+					}
+				}
+			}
+		}
+		return forcedPieces;
+	}
 	private void TryMove(int x1, int y1, int x2, int y2){
+		forcedPieces = ScaneForPossibleMoves ();
 		//Mulitplayer support
 		startDrag = new Vector2 (x1, y1);
 		endDrag = new Vector2 (x2, y2);
 		selectedPiece = pieces [x1, y1];
 
-		movePiece (selectedPiece, x2, y2);
+		//out of bounds
+		if (x2 < 0 || x2 >= 8 || y2 < 0 || y2 >= 8) {
+			if (selectedPiece != null) {
+				movePiece (selectedPiece, x1, y1);
+			}
+			startDrag = Vector2.zero;
+			selectedPiece = null;
+			return;
+		}
+	
+		if (selectedPiece != null) {
+			//if we did not move
+			if (endDrag == startDrag) {
+				movePiece (selectedPiece, x1, y1);
+				startDrag = Vector2.zero;
+				selectedPiece = null;
+				return;
+			}
+			//check if its valid move
+			if (selectedPiece.ValidMove(pieces, x1, y1, x2, y2)) {
+				if (Mathf.Abs (x1 - x2) == 2) {
+					Piece p = pieces[(x1 + x2)/2, (y1 + y2)/2];
+					if (p != null) {
+						pieces [(x1 + x2) / 2, (y1 + y2) / 2] = null;
+						Destroy (p.gameObject);
+						hasKilled = true;
+					}
+				}
+				//Are we supposed to kill anything?
+				if (forcedPieces.Count != 0 && !hasKilled) {
+					movePiece (selectedPiece, x1, y1);
+					startDrag = Vector2.zero;
+					selectedPiece = null;
+					return;
+				}
+
+				//making the move in the array.
+				pieces [x2, y2] = selectedPiece;
+				pieces [x1, y1] = null;
+
+				movePiece (selectedPiece, x2, y2);
+
+				endTurn ();
+			}
+			else{
+				movePiece (selectedPiece, x1, y1);
+				startDrag = Vector2.zero;
+				selectedPiece = null;
+				return;
+			}
+		}
+		//movePiece (selectedPiece, x2, y2);
+	}
+	private void updatePieceDrag(Piece p){
+		RaycastHit hit;
+		if (Physics.Raycast (Camera.main.ScreenPointToRay (Input.mousePosition), out hit, 25.0f, LayerMask.GetMask ("Board"))) {
+			p.transform.position = hit.point + Vector3.up;
+		}
 	}
 	private void updateMouseOver(){
 		RaycastHit hit;
@@ -59,14 +141,23 @@ public class BoardManager : MonoBehaviour {
 
 	private void selectPiece(int x, int y){
 		//Out of bounds
-		if (x < 0 || y < 0 || x > pieces.Length || y > pieces.Length)
+		if (x < 0 || y < 0 || x > 8 || y > 8)
 			return;
 		Piece p = pieces [x, y];
-		if (p != null) {
-			selectedPiece = p;
-			startDrag = mouseOver;
+		if (p != null && p.isWhite == isWhite) {
+
+			if (forcedPieces.Count == 0) {
+				selectedPiece = p;
+				startDrag = mouseOver;
+			} else {
+				//Look for the piece under our forced pieces list
+				if (forcedPieces.Find (fp => fp == p) == null)
+					return;
+				
+				selectedPiece = p;
+				startDrag = mouseOver;
+			}
 		}
-		Debug.Log (selectedPiece.name);
 	}
 	private void generateBoard(){
 		//generate White team.
@@ -101,5 +192,15 @@ public class BoardManager : MonoBehaviour {
 
 	private void movePiece(Piece p, int x, int y){
 		p.transform.position = (Vector3.right * x) + (Vector3.forward * y) + boardOffset +pieceOffset;
+	}
+
+	private void checkVictory(){
+	}
+	private void endTurn(){
+		selectedPiece = null;
+		startDrag = Vector2.zero;
+		whiteTurn = !whiteTurn;
+		hasKilled = false;
+		checkVictory ();
 	}
 }
