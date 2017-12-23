@@ -47,7 +47,13 @@ public class BoardManager : MonoBehaviour {
 		}
 
 	}
-	private List<Piece> ScaneForPossibleMoves(){
+	private List<Piece> ScanForPossibleMoves(Piece p, int x, int y){
+		if (pieces [x, y].isForcedToMove(pieces, x, y))
+			forcedPieces.Add (pieces [x, y]);
+		return forcedPieces;
+			
+	}
+	private List<Piece> ScanForPossibleMoves(){
 		forcedPieces = new List<Piece>();
 
 		//Checker all the picese
@@ -63,7 +69,7 @@ public class BoardManager : MonoBehaviour {
 		return forcedPieces;
 	}
 	private void TryMove(int x1, int y1, int x2, int y2){
-		forcedPieces = ScaneForPossibleMoves ();
+		forcedPieces = ScanForPossibleMoves ();
 		//Mulitplayer support
 		startDrag = new Vector2 (x1, y1);
 		endDrag = new Vector2 (x2, y2);
@@ -197,8 +203,24 @@ public class BoardManager : MonoBehaviour {
 	private void checkVictory(){
 	}
 	private void endTurn(){
+		int x = (int)endDrag.x;
+		int y = (int)endDrag.y;
+
+		if (selectedPiece != null) {
+			if (selectedPiece.isWhite && !selectedPiece && y == 7) {
+				selectedPiece.isKing = true;
+				selectedPiece.transform.Rotate (Vector3.right * 180);
+			}
+			if (!selectedPiece.isWhite && !selectedPiece && y == 0) {
+				selectedPiece.isKing = true;
+				selectedPiece.transform.Rotate (Vector3.right * 180);
+			}
+		}
 		selectedPiece = null;
 		startDrag = Vector2.zero;
+
+		if (ScanForPossibleMoves (selectedPiece, x, y).Count != 0 && hasKilled)
+			return;
 		whiteTurn = !whiteTurn;
 		hasKilled = false;
 		checkVictory ();

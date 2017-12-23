@@ -15,7 +15,7 @@ public class Piece : MonoBehaviour {
 				//If there is a piece, and its not the same colour as ours
 				if (p != null && p.isWhite != isWhite) {
 					//Check of its possible to land after the jump
-					if (board [x - 2, x + 2] == null) {
+					if (board [x - 2, y + 2] == null) {
 						return true;
 					}
 				}
@@ -53,7 +53,7 @@ public class Piece : MonoBehaviour {
 				//If there is a piece, and its not the same colour as ours
 				if (p != null && p.isWhite != isWhite) {
 					//Check of its possible to land after the jump
-					if (board [x + 2, x - 2] == null) {
+					if (board [x + 2, y - 2] == null) {
 						return true;
 					}
 				}
