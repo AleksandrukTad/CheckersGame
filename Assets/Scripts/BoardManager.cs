@@ -5,7 +5,7 @@ using UnityEngine;
 public class BoardManager : MonoBehaviour {
 
 	//Board generation
-	public Piece[,] pieces = new Piece[8, 8];
+	public Piece[,] board = new Piece[8, 8];
 	public GameObject whitePiecePrefab;
 	public GameObject blackPiecePrefab;
 	public Vector3 boardOffset = new Vector3(-4.0f, 0, -4.0f);
@@ -61,7 +61,7 @@ public class BoardManager : MonoBehaviour {
 		//if x and y is not out of bound
 		if (x >= 0 && x <= 7 && y >= 0 && y <= 7) 
 		{
-			Piece p = pieces [x, y];
+			Piece p = board [x, y];
 
 			if (p != null) 
 			{
@@ -71,12 +71,17 @@ public class BoardManager : MonoBehaviour {
 			}
 		} 
 	}
+/**************************************************************************/
+//UTILS
 
+
+/**************************************************************************/
+//MOVEMENT
 	private void AttemptToMove(int xS, int yS, int xE, int yE){
 		//for multiplayer, we need to redefine those values.
 		startDrag = new Vector2 (xS, yS);
 		endDrag = new Vector2 (xE, yE);
-		selectedPiece = pieces [xS, yS];
+		selectedPiece = board [xS, yS];
 
 		//if its out of bond
 		if(xE < 0 || xE > 7 || yE < 0 || yE > 7)
@@ -90,9 +95,10 @@ public class BoardManager : MonoBehaviour {
 			return;
 		}
 
-		if (selectedPiece.checkIfValidMove (pieces, xS, yS, xE, yE)) 
+		//If the move is valid according to checkIfValidMove function
+		if (selectedPiece.checkIfValidMove (board, xS, yS, xE, yE)) 
 		{
-			//If we pick up, but then we want to put back
+			
 		}
 
 		//if the move is not valid, put back piece
@@ -113,6 +119,9 @@ public class BoardManager : MonoBehaviour {
 		p.transform.position = (Vector3.right * x) + (Vector3.forward * y) + boardOffset +pieceOffset;
 	}
 
+/**************************************************************************/
+//DRAGING
+	//function to create an "animation" of draging
 	private void PieceDraging(Piece p){
 		
 		RaycastHit hit;
@@ -122,7 +131,8 @@ public class BoardManager : MonoBehaviour {
 			p.transform.position = hit.point + Vector3.up;
 		}
 	}
-	/**************************************************************************/
+/**************************************************************************/
+//GENERATE BOARD
 	//Generating the board and pieces
 	private void GenerateBoard(){
 		//generate White team.
@@ -151,7 +161,7 @@ public class BoardManager : MonoBehaviour {
 		GameObject go = Instantiate ((isWhite)?whitePiecePrefab : blackPiecePrefab) as GameObject;
 		go.transform.SetParent (transform);
 		Piece p = go.GetComponent<Piece> ();
-		pieces [x, y] = p;
+		board [x, y] = p;
 		movePiece (p, x, y);
 	}
 }
