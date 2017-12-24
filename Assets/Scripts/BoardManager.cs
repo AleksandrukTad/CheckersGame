@@ -28,6 +28,9 @@ public class BoardManager : MonoBehaviour {
 		MouseOver ();
 		//Here will we have tu check if its my turn
 		{
+			if (selectedPiece != null) {
+				PieceDraging (selectedPiece);
+			}
 			//saving x and y in variables.
 			int x = (int)mouseOver.x;
 			int y = (int)mouseOver.y;
@@ -36,7 +39,7 @@ public class BoardManager : MonoBehaviour {
 				SelectPiece (x, y);
 			}
 			//after we select piece, we click where do we want to put it
-			if(Input.GetMouseButton(0)){
+			if(Input.GetMouseButtonUp(0)){
 				AttemptToMove ((int)startDrag.x, (int)startDrag.y, x, y);
 			}
 		}
@@ -56,17 +59,17 @@ public class BoardManager : MonoBehaviour {
 
 	private void SelectPiece(int x, int y){
 		//if x and y is not out of bound
-		if (x >= 0 && x <= 7 && y >= 0 && y <= 7) {
+		if (x >= 0 && x <= 7 && y >= 0 && y <= 7) 
+		{
 			Piece p = pieces [x, y];
 
-			if (p != null) {
+			if (p != null) 
+			{
 				selectedPiece = p;
 				startDrag = mouseOver;
-				Debug.Log (selectedPiece.name);
+				Debug.Log ("piece selected");
 			}
-
-		} else
-			return;
+		} 
 	}
 
 	private void AttemptToMove(int xS, int yS, int xE, int yE){
@@ -75,11 +78,49 @@ public class BoardManager : MonoBehaviour {
 		endDrag = new Vector2 (xE, yE);
 		selectedPiece = pieces [xS, yS];
 
-		movePiece (selectedPiece, xE, yE);
+		//if its out of bond
+		if(xE < 0 || xE > 7 || yE < 0 || yE > 7)
+		{
+			if (selectedPiece != null) {
+				movePiece (selectedPiece, (int)startDrag.x, (int)startDrag.y);
+			}
+			startDrag = Vector2.zero;
+			selectedPiece = null;
+			Debug.Log ("Put back, because of button up was out of bound");
+			return;
+		}
+
+		if (selectedPiece.checkIfValidMove (pieces, xS, yS, xE, yE)) 
+		{
+			//If we pick up, but then we want to put back
+		}
+
+		//if the move is not valid, put back piece
+		//This also handles, putting up and putting back in the same place
+		else 
+		{
+			if (selectedPiece != null) {
+				movePiece (selectedPiece, (int)startDrag.x, (int)startDrag.y);
+			}
+			startDrag = Vector2.zero;
+			selectedPiece = null;
+			Debug.Log ("Put back piece, because of invalid move or picked up and dropped");
+			return;
+		}
 	}
 
 	private void movePiece(Piece p, int x, int y){
 		p.transform.position = (Vector3.right * x) + (Vector3.forward * y) + boardOffset +pieceOffset;
+	}
+
+	private void PieceDraging(Piece p){
+		
+		RaycastHit hit;
+		if (Physics.Raycast (Camera.main.ScreenPointToRay (Input.mousePosition), out hit, 30.0f, LayerMask.GetMask ("Board"))) 
+		{
+			//this makes piece to move with mouse and elevates it.
+			p.transform.position = hit.point + Vector3.up;
+		}
 	}
 	/**************************************************************************/
 	//Generating the board and pieces
