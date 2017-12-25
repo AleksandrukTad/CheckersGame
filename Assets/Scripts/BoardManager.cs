@@ -19,6 +19,9 @@ public class BoardManager : MonoBehaviour {
 	private Vector2 startDrag;
 	private Vector2 endDrag;
 
+	//did piece, killed other piece?
+	private bool killed = false;
+
 	private void Start()
 	{
 		GenerateBoard ();
@@ -83,6 +86,7 @@ public class BoardManager : MonoBehaviour {
 		endDrag = new Vector2 (xE, yE);
 		selectedPiece = board [xS, yS];
 
+
 		//if its out of bond
 		if(xE < 0 || xE > 7 || yE < 0 || yE > 7)
 		{
@@ -94,13 +98,22 @@ public class BoardManager : MonoBehaviour {
 			Debug.Log ("Put back, because of button up was out of bound");
 			return;
 		}
-
 		//If the move is valid according to checkIfValidMove function
-		if (selectedPiece.checkIfValidMove (board, xS, yS, xE, yE)) 
+		if (selectedPiece.checkIfValidMove (board, xS, yS, xE, yE, out killed)) 
 		{
-			
+			board [xE, yE] = board [xS, yS];
+			board [xS, yS] = null;
+			movePiece (selectedPiece, (int)endDrag.x, (int)endDrag.y);
+			if (killed == true) {
+				int midX = (xS + xE) / 2;
+				int midY = (yS + yE) / 2;
+				Piece killedPiece = board [midX, midY];
+				board [midX, midY] = null;
+				Destroy (killedPiece.gameObject);
+			}
+			EndTurn ();
+			return;
 		}
-
 		//if the move is not valid, put back piece
 		//This also handles, putting up and putting back in the same place
 		else 
@@ -163,5 +176,15 @@ public class BoardManager : MonoBehaviour {
 		Piece p = go.GetComponent<Piece> ();
 		board [x, y] = p;
 		movePiece (p, x, y);
+	}
+
+/**************************************************************************/
+//END TURN
+	private void EndTurn()
+	{
+		endDrag = Vector2.zero;
+		startDrag = Vector2.zero;
+		selectedPiece = null;
+		killed = false;
 	}
 }

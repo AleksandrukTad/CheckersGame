@@ -28,6 +28,5 @@ D:\Unity - Projekty\Multiplayer Checkers\Temp\bin\Debug\UnityEngine.Timeline.xml
 D:\Unity - Projekty\Multiplayer Checkers\Temp\bin\Debug\UnityEngine.Analytics.xml
 D:\Unity - Projekty\Multiplayer Checkers\Temp\bin\Debug\UnityEngine.HoloLens.xml
 D:\Unity - Projekty\Multiplayer Checkers\obj\Debug\Assembly-CSharp.csprojResolveAssemblyReference.cache
-D:\Unity - Projekty\Multiplayer Checkers\obj\Debug\Assembly-CSharp.csproj.CoreCompileInputs.cache
 D:\Unity - Projekty\Multiplayer Checkers\obj\Debug\Assembly-CSharp.dll
 D:\Unity - Projekty\Multiplayer Checkers\obj\Debug\Assembly-CSharp.pdb
