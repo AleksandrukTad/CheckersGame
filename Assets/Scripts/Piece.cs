@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Piece : MonoBehaviour {
 
+	public int x;
+	public int y;
 	private bool isQueen;
 	public bool isWhite;
 

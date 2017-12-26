@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class BoardManager : MonoBehaviour {
@@ -18,13 +19,18 @@ public class BoardManager : MonoBehaviour {
 	private Piece selectedPiece;
 	private Vector2 startDrag;
 	private Vector2 endDrag;
+	private List<Piece> forcedToMove; 
 
 	//did piece, killed other piece?
 	private bool killed = false;
 
+	//Turns
+	private bool isWhiteTurn = true;
+
 	private void Start()
 	{
 		GenerateBoard ();
+		Scan ();
 	}
 	private void Update(){
 		
@@ -65,19 +71,66 @@ public class BoardManager : MonoBehaviour {
 		if (x >= 0 && x <= 7 && y >= 0 && y <= 7) 
 		{
 			Piece p = board [x, y];
-
-			if (p != null) 
-			{
-				selectedPiece = p;
-				startDrag = mouseOver;
-				Debug.Log ("piece selected");
+			//When forcedToMove is not empty, we have to check if piece which is going to be selected,
+			//is inside forcedToMove.
+			if (forcedToMove.Count != 0) {
+				if (p != null && forcedToMove.Any (piece => piece == p)) {
+					selectedPiece = p;
+					startDrag = new Vector2 (selectedPiece.x, selectedPiece.y);
+					Debug.Log ("piece selected");
+				}
+			}
+			//if forcedToMove is empty then we can pick whatever we want!
+			else {
+				if (p != null) {
+					selectedPiece = p;
+					startDrag = new Vector2 (selectedPiece.x, selectedPiece.y);
+					Debug.Log ("piece selected");
+				}
 			}
 		} 
 	}
 /**************************************************************************/
 //UTILS
-
-
+	private void Scan(){
+		forcedToMove = new List<Piece> ();
+		for (int i = 0; i < 8; i++) {
+			for (int j = 0; j < 8; j++) {
+				//check if scan will not go out of bounds
+				if (board [j, i] != null) {
+					//Debug.Log ("Board " + j + ":" + i);
+					//if its white turn
+					if (isWhiteTurn) {
+						//if there is a piece
+						//check if the top right exists and its different colour
+						if ((j + 1 >= 0 && j + 1 <= 7) && (i + 1 >= 0 && i + 1 <= 7)) {
+							if (board [j + 1, i + 1] != null && board [j, i].isWhite != board [j + 1, i + 1].isWhite) {
+								//check if next piece, in top right exists if not
+								//we are able to kill
+								if ((j + 2 >= 0 && j + 2 <= 7) && (i + 2 >= 0 && i + 2 <= 7)) {
+									if (board [j + 2, i + 2] == null) {
+										forcedToMove.Add (board [j, i]);
+									}
+								}
+							}
+						}
+						//check if the top left exists and its different colour
+						if ((j - 1 >= 0 && j - 1 <= 7) && (i - 1 >= 0 && i + 1 <= 7)) {  
+							if (board [j - 1, i + 1] != null && board [j, i].isWhite != board [j - 1, i + 1].isWhite) {
+								//check if next piece, in top right exists if not
+								//we are able to kill
+								if ((j - 2 >= 0 && j - 2 <= 7) && (i + 2 >= 0 && i + 2 <= 7)) {
+									if (board [j - 2, i + 2] == null) {
+										forcedToMove.Add (board [j, i]);
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 /**************************************************************************/
 //MOVEMENT
 	private void AttemptToMove(int xS, int yS, int xE, int yE){
@@ -101,8 +154,13 @@ public class BoardManager : MonoBehaviour {
 		//If the move is valid according to checkIfValidMove function
 		if (selectedPiece.checkIfValidMove (board, xS, yS, xE, yE, out killed)) 
 		{
-			board [xE, yE] = board [xS, yS];
+			//changing x, y for piece object
+			selectedPiece.x = xE;
+			selectedPiece.y = yE;
+			//changing x,y for board 
+			board [xE, yE] = selectedPiece;
 			board [xS, yS] = null;
+
 			movePiece (selectedPiece, (int)endDrag.x, (int)endDrag.y);
 			if (killed == true) {
 				int midX = (xS + xE) / 2;
@@ -174,6 +232,8 @@ public class BoardManager : MonoBehaviour {
 		GameObject go = Instantiate ((isWhite)?whitePiecePrefab : blackPiecePrefab) as GameObject;
 		go.transform.SetParent (transform);
 		Piece p = go.GetComponent<Piece> ();
+		p.x = x;
+		p.y = y;
 		board [x, y] = p;
 		movePiece (p, x, y);
 	}
@@ -186,5 +246,13 @@ public class BoardManager : MonoBehaviour {
 		startDrag = Vector2.zero;
 		selectedPiece = null;
 		killed = false;
+
+		if (isWhiteTurn == true) {
+			isWhiteTurn = false;
+		} else {
+			isWhiteTurn = true;
+		}
+		Scan ();
+		Debug.Log (forcedToMove.Count);
 	}
 }
