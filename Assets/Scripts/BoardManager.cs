@@ -92,6 +92,7 @@ public class BoardManager : MonoBehaviour {
 	}
 /**************************************************************************/
 //UTILS
+	//Scan whole board to look for piece, that can kill
 	private void Scan(){
 		forcedToMove = new List<Piece> ();
 		for (int i = 0; i < 8; i++) {
@@ -157,6 +158,59 @@ public class BoardManager : MonoBehaviour {
 			}
 		}
 	}
+	//Check if piece, which just killed can kill again
+	private void Scan(Piece p){
+		forcedToMove = new List<Piece> ();
+
+		if (isWhiteTurn && p.isWhite) {
+			//if top right is not out of bound
+			if(p.x + 1 <= 7 && p.y + 1 <= 7){
+				//if top right is not null AND top right from investigated has different colour from investigated 
+				if(board[p.x + 1, p.y + 1] != null && board[p.x + 1, p.y + 1].isWhite != p.isWhite){
+					if (p.x + 2 <= 7 && p.y + 2 <= 7) {
+						if (board [p.x + 1, p.y + 1] == null) {
+							forcedToMove.Add (p);
+						}
+					}
+				}
+			}
+			//if top left is not out of bound
+			if(p.x - 1 >= 0 && p.y + 1 <= 7){
+				//if top left is not null AND top right from investigated has different colour from investigated 
+				if(board[p.x - 1, p.y + 1] != null && board[p.x - 1, p.y + 1].isWhite != p.isWhite){
+					if (p.x - 2 >= 0 && p.y + 2 <= 7) {
+						if (board [p.x - 2, p.y + 2] == null) {
+							forcedToMove.Add (p);
+						}
+					}
+				}
+			}
+		}
+		else if (!isWhiteTurn && !p.isWhite) {
+			//if bottom right is not out of bound
+			if(p.x + 1 <= 7 && p.y - 1 >= 0){
+				//if bottom right is not null AND top right from investigated has different colour from investigated 
+				if(board[p.x + 1, p.y - 1] != null && board[p.x + 1, p.y - 1].isWhite != p.isWhite){
+					if (p.x + 2 <= 7 && p.y - 2 >= 0) {
+						if (board [p.x + 1, p.y - 1] == null) {
+							forcedToMove.Add (p);
+						}
+					}
+				}
+			}
+			//if bottom left is not out of bound
+			if(p.x - 1 >= 0 && p.y - 1 >= 0){
+				//if top left is not null AND top right from investigated has different colour from investigated 
+				if(board[p.x - 1, p.y - 1] != null && board[p.x - 1, p.y - 1].isWhite != p.isWhite){
+					if (p.x - 2 >= 0 && p.y - 2 >= 0) {
+						if (board [p.x - 2, p.y - 2] == null) {
+							forcedToMove.Add (p);
+						}
+					}
+				}
+			}
+		}
+	}
 /**************************************************************************/
 //MOVEMENT
 	private void AttemptToMove(int xS, int yS, int xE, int yE){
@@ -194,6 +248,14 @@ public class BoardManager : MonoBehaviour {
 				Piece killedPiece = board [midX, midY];
 				board [midX, midY] = null;
 				Destroy (killedPiece.gameObject);
+				startDrag = Vector2.zero;
+				Scan (selectedPiece);
+				selectedPiece = null;
+				if (forcedToMove.Count == 0) {
+					EndTurn();
+				}
+				Debug.Log (forcedToMove.Count);
+				return;
 			}
 			EndTurn ();
 			return;

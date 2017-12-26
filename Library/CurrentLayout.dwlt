@@ -557,7 +557,7 @@ MonoBehaviour:
     width: 756
     height: 412
   m_MaximizeOnPlay: 0
-  m_Gizmos: 0
+  m_Gizmos: 1
   m_Stats: 0
   m_SelectedSizes: 0500000000000000000000000a000000000000000000000000000000000000000000000000000000
   m_TargetDisplay: 0
