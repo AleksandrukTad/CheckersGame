@@ -23,6 +23,7 @@ public class BoardManager : MonoBehaviour {
 
 	//did piece, killed other piece?
 	private bool killed = false;
+	private Piece killedPiece;
 
 	//Turns
 	public bool isWhiteTurn = true;
@@ -232,7 +233,7 @@ public class BoardManager : MonoBehaviour {
 			return;
 		}
 		//If the move is valid according to checkIfValidMove function
-		if (selectedPiece.checkIfValidMove (board, xS, yS, xE, yE, out killed)) 
+		if (selectedPiece.checkIfValidMove (board, xS, yS, xE, yE, out killed, out killedPiece)) 
 		{
 			//changing x, y for piece object
 			selectedPiece.x = xE;
@@ -243,20 +244,27 @@ public class BoardManager : MonoBehaviour {
 
 			movePiece (selectedPiece, (int)endDrag.x, (int)endDrag.y);
 			if (killed == true) {
-				int midX = (xS + xE) / 2;
-				int midY = (yS + yE) / 2;
-				Piece killedPiece = board [midX, midY];
-				board [midX, midY] = null;
+				//scenario when piece, is killed by regular piece
+					//int midX = (xS + xE) / 2;
+					//int midY = (yS + yE) / 2;
+					//Piece killedPiece = board [midX, midY];
+					//board [midX, midY] = null;
+				board[killedPiece.x, killedPiece.y] = null;
 				Destroy (killedPiece.gameObject);
+
 				startDrag = Vector2.zero;
 				Scan (selectedPiece);
-				selectedPiece = null;
-				if (forcedToMove.Count == 0) {
+
+				CheckIfCanBeQueen (selectedPiece);
+
+				if (forcedToMove.Count == 0 || selectedPiece.isQueen) {
 					EndTurn();
 				}
+				selectedPiece = null;
 				Debug.Log (forcedToMove.Count);
 				return;
 			}
+			CheckIfCanBeQueen (selectedPiece);
 			EndTurn ();
 			return;
 		}
@@ -277,7 +285,6 @@ public class BoardManager : MonoBehaviour {
 	private void movePiece(Piece p, int x, int y){
 		p.transform.position = (Vector3.right * x) + (Vector3.forward * y) + boardOffset +pieceOffset;
 	}
-
 /**************************************************************************/
 //DRAGING
 	//function to create an "animation" of draging
@@ -325,11 +332,19 @@ public class BoardManager : MonoBehaviour {
 		board [x, y] = p;
 		movePiece (p, x, y);
 	}
-
+/**************************************************************************/
+//MAKE QUEEN
+	private void CheckIfCanBeQueen(Piece p)
+	{
+		if (((selectedPiece.y == 0 && !selectedPiece.isWhite) || (selectedPiece.y == 7 && selectedPiece.isWhite)) && !selectedPiece.isQueen) {
+			board [selectedPiece.x, selectedPiece.y].isQueen = true;
+			p.transform.Rotate (Vector3.right * 180);
+		}
+	}
 /**************************************************************************/
 //END TURN
 	private void EndTurn()
-	{
+	{	
 		endDrag = Vector2.zero;
 		startDrag = Vector2.zero;
 		selectedPiece = null;
