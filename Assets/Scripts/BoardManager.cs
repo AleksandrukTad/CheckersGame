@@ -25,7 +25,7 @@ public class BoardManager : MonoBehaviour {
 	private bool killed = false;
 
 	//Turns
-	private bool isWhiteTurn = true;
+	public bool isWhiteTurn = true;
 
 	private void Start()
 	{
@@ -74,7 +74,7 @@ public class BoardManager : MonoBehaviour {
 			//When forcedToMove is not empty, we have to check if piece which is going to be selected,
 			//is inside forcedToMove.
 			if (forcedToMove.Count != 0) {
-				if (p != null && forcedToMove.Any (piece => piece == p)) {
+				if (p != null && p.isWhite == isWhiteTurn && forcedToMove.Any (piece => piece == p)) {
 					selectedPiece = p;
 					startDrag = new Vector2 (selectedPiece.x, selectedPiece.y);
 					Debug.Log ("piece selected");
@@ -82,7 +82,7 @@ public class BoardManager : MonoBehaviour {
 			}
 			//if forcedToMove is empty then we can pick whatever we want!
 			else {
-				if (p != null) {
+				if (p != null && p.isWhite == isWhiteTurn) {
 					selectedPiece = p;
 					startDrag = new Vector2 (selectedPiece.x, selectedPiece.y);
 					Debug.Log ("piece selected");
@@ -100,14 +100,14 @@ public class BoardManager : MonoBehaviour {
 				if (board [j, i] != null) {
 					//Debug.Log ("Board " + j + ":" + i);
 					//if its white turn
-					if (isWhiteTurn) {
+					if (isWhiteTurn && board[j,i].isWhite) {
 						//if there is a piece
 						//check if the top right exists and its different colour
-						if ((j + 1 >= 0 && j + 1 <= 7) && (i + 1 >= 0 && i + 1 <= 7)) {
+						if (j + 1 <= 7 && i + 1 <= 7) {
 							if (board [j + 1, i + 1] != null && board [j, i].isWhite != board [j + 1, i + 1].isWhite) {
 								//check if next piece, in top right exists if not
 								//we are able to kill
-								if ((j + 2 >= 0 && j + 2 <= 7) && (i + 2 >= 0 && i + 2 <= 7)) {
+								if (j + 2 <= 7 && i + 2 <= 7) {
 									if (board [j + 2, i + 2] == null) {
 										forcedToMove.Add (board [j, i]);
 									}
@@ -115,12 +115,38 @@ public class BoardManager : MonoBehaviour {
 							}
 						}
 						//check if the top left exists and its different colour
-						if ((j - 1 >= 0 && j - 1 <= 7) && (i - 1 >= 0 && i + 1 <= 7)) {  
+						if (j - 1 >= 0 && i + 1 <= 7) {  
 							if (board [j - 1, i + 1] != null && board [j, i].isWhite != board [j - 1, i + 1].isWhite) {
 								//check if next piece, in top right exists if not
 								//we are able to kill
-								if ((j - 2 >= 0 && j - 2 <= 7) && (i + 2 >= 0 && i + 2 <= 7)) {
+								if (j - 2 >= 0 && i + 2 <= 7) {
 									if (board [j - 2, i + 2] == null) {
+										forcedToMove.Add (board [j, i]);
+									}
+								}
+							}
+						}
+					} else if (!isWhiteTurn && !board[j,i].isWhite) {
+						//if there is a piece
+						//check if the bottom right exists and its different colour
+						if (j + 1 <= 7 && i - 1 >= 0) {
+							if (board [j + 1, i - 1] != null && board [j, i].isWhite != board [j + 1, i - 1].isWhite) {
+								//check if next piece, in top right exists if not
+								//we are able to kill
+								if (j + 2 <= 7 && i - 2 >= 0) {
+									if (board [j + 2, i - 2] == null) {
+										forcedToMove.Add (board [j, i]);
+									}
+								}
+							}
+						}
+						//check if the bottom left exists and its different colour
+						if (j - 1 >= 0 && i - 1 >= 0) {  
+							if (board [j - 1, i - 1] != null && board [j, i].isWhite != board [j - 1, i - 1].isWhite) {
+								//check if next piece, in top right exists if not
+								//we are able to kill
+								if (j - 2 >= 0 && i - 2 >= 0) {
+									if (board [j - 2, i - 2] == null) {
 										forcedToMove.Add (board [j, i]);
 									}
 								}
