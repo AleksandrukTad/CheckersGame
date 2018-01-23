@@ -17,6 +17,7 @@ public class Piece : MonoBehaviour {
 			killed = false;
 			return false;
 		}
+		//INTERNATIONAL RULES
 		//Checks if we move piece diagonally
 		int deltaX = Mathf.Abs(xE - xS);
 		int Y = yE - yS;
@@ -44,7 +45,20 @@ public class Piece : MonoBehaviour {
 						return true;
 					}
                 }
+				if(Y == -2)
+				{	//count middle point between start and end Drag
+					int midX = (xS + xE) / 2;
+					int midY = (yS + yE) / 2;
+					//if this point is not null and its not the same colour as selected piece
+					if (board [midX, midY] != null || board [midX, midY].isWhite != isWhite) {
+						//kill
+						p = board [midX, midY];
+						killed = true;
+						return true;
+					}
+				}
             }
+
         }
 		else if (!isWhite && !isQueen)
         {
@@ -56,7 +70,20 @@ public class Piece : MonoBehaviour {
 				}
 			}
 			else if (deltaX == 2)
-			{   //possible jump and kill
+			{   
+				if(Y == 2)
+				{	//count middle point between start and end Drag
+					int midX = (xS + xE) / 2;
+					int midY = (yS + yE) / 2;
+					//if this point is not null and its not the same colour as selected piece
+					if (board [midX, midY] != null || board [midX, midY].isWhite != isWhite) {
+						//kill
+						p = board [midX, midY];
+						killed = true;
+						return true;
+					}
+				}
+				//possible jump and kill
 				if(Y == -2)
 				{	//count middle point between start and end Drag
 					int midX = (xS + xE) / 2;
@@ -71,10 +98,10 @@ public class Piece : MonoBehaviour {
 				}
 			}
         }
+		//INTERNATIONAL RULES
 		if (isQueen) {
 
 			int y = this.y;
-
 			//diagonaly going up and right
 			for (int x = this.x; x <= xE && y <= yE; x++, y++) {
 				//if "road" from current location to destiny 
@@ -88,11 +115,99 @@ public class Piece : MonoBehaviour {
 				//if piece come across, piece which is different colour
 				if (board [x, y] != null && board[x,y].isWhite != isWhite) {
 					//check if behind this piece is empty place.
+					if (board [x + 1, y + 1] == null) {
+						//check if player set destination to the field after that piece
+						if (xE == x + 1 && yE == y + 1) {
+							killed = true;
+							p = board [x, y];
+							return true;
+						}
+						//if not look if the destination picked by player is valid
+						int j = y + 1;
+						//look for the next, piece going top right.
+						for (int i = x + 1; board[i,j] == null; i++, j++) {
+								//check if scanned possition in "landing" position.
+							if (i == xE && j == yE) {
+								killed = true;
+								p = board [x, y];
+								return true;
+							}
+						}
+					}
+				}
+			}
+			y = this.y;
+			//diagonaly going up and left
+			for (int x = this.x; x >= xE && y <= yE; x--, y++) {
+				//if "road" from current location to destiny 
+				//is "clear"
+				if (board [x, y] == null) {
+					if (x == xE && y == yE) {
+						killed = false;
+						return true;
+					}
+				}
+				//if piece come across, piece which is different colour
+				if (board [x, y] != null && board[x,y].isWhite != isWhite) {
+					//check if behind this piece is empty place.
 					//and check if player set destination to that field.
-					if (board [x + 1, y + 1] == null && xE == x + 1 && yE == y +1) {
+					if (board [x - 1, y + 1] == null && xE == x - 1 && yE == y +1) {
 						killed = true;
 						p = board [x, y];
 						return true;
+					}else {
+						killed = false;
+						return false;
+					}
+				}
+			}
+			y = this.y;
+			//diagonaly going down and right
+			for (int x = this.x; x <= xE && y >= yE; x++, y--) {
+				//if "road" from current location to destiny 
+				//is "clear"
+				if (board [x, y] == null) {
+					if (x == xE && y == yE) {
+						killed = false;
+						return true;
+					}
+				}
+				//if piece come across, piece which is different colour
+				if (board [x, y] != null && board[x,y].isWhite != isWhite) {
+					//check if behind this piece is empty place.
+					//and check if player set destination to that field.
+					if (board [x + 1, y - 1] == null && xE == x + 1 && yE == y - 1) {
+						killed = true;
+						p = board [x, y];
+						return true;
+					}else {
+						killed = false;
+						return false;
+					}
+				}
+			}
+			y = this.y;
+			//diagonaly going down and left
+			for (int x = this.x; x >= xE && y >= yE; x--, y--) {
+				//if "road" from current location to destiny 
+				//is "clear"
+				if (board [x, y] == null) {
+					if (x == xE && y == yE) {
+						killed = false;
+						return true;
+					}
+				}
+				//if piece come across, piece which is different colour
+				if (board [x, y] != null && board[x,y].isWhite != isWhite) {
+					//check if behind this piece is empty place.
+					//and check if player set destination to that field.
+					if (board [x - 1, y - 1] == null && xE == x - 1 && yE == y - 1) {
+						killed = true;
+						p = board [x, y];
+						return true;
+					} else {
+						killed = false;
+						return false;
 					}
 				}
 			}

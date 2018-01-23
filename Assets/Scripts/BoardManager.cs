@@ -99,62 +99,61 @@ public class BoardManager : MonoBehaviour {
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
 				//check if scan will not go out of bounds
-				if (board [j, i] != null) {
-					//Debug.Log ("Board " + j + ":" + i);
+				if (board [j, i] != null && !board [j, i].isQueen) {
 					//if its white turn
-					if (isWhiteTurn && board[j,i].isWhite) {
-						//if there is a piece
-						//check if the top right exists and its different colour
-						if (j + 1 <= 7 && i + 1 <= 7) {
-							if (board [j + 1, i + 1] != null && board [j, i].isWhite != board [j + 1, i + 1].isWhite) {
-								//check if next piece, in top right exists if not
-								//we are able to kill
-								if (j + 2 <= 7 && i + 2 <= 7) {
-									if (board [j + 2, i + 2] == null) {
-										forcedToMove.Add (board [j, i]);
-									}
-								}
-							}
-						}
-						//check if the top left exists and its different colour
-						if (j - 1 >= 0 && i + 1 <= 7) {  
-							if (board [j - 1, i + 1] != null && board [j, i].isWhite != board [j - 1, i + 1].isWhite) {
-								//check if next piece, in top right exists if not
-								//we are able to kill
-								if (j - 2 >= 0 && i + 2 <= 7) {
-									if (board [j - 2, i + 2] == null) {
-										forcedToMove.Add (board [j, i]);
-									}
-								}
-							}
-						}
-					} else if (!isWhiteTurn && !board[j,i].isWhite) {
-						//if there is a piece
-						//check if the bottom right exists and its different colour
-						if (j + 1 <= 7 && i - 1 >= 0) {
-							if (board [j + 1, i - 1] != null && board [j, i].isWhite != board [j + 1, i - 1].isWhite) {
-								//check if next piece, in top right exists if not
-								//we are able to kill
-								if (j + 2 <= 7 && i - 2 >= 0) {
-									if (board [j + 2, i - 2] == null) {
-										forcedToMove.Add (board [j, i]);
-									}
-								}
-							}
-						}
-						//check if the bottom left exists and its different colour
-						if (j - 1 >= 0 && i - 1 >= 0) {  
-							if (board [j - 1, i - 1] != null && board [j, i].isWhite != board [j - 1, i - 1].isWhite) {
-								//check if next piece, in top right exists if not
-								//we are able to kill
-								if (j - 2 >= 0 && i - 2 >= 0) {
-									if (board [j - 2, i - 2] == null) {
-										forcedToMove.Add (board [j, i]);
-									}
+					//if (isWhiteTurn && board[j,i].isWhite) {
+					//if there is a piece
+					//check if the top right exists and its different colour
+					if (j + 1 <= 7 && i + 1 <= 7) {
+						if (board [j + 1, i + 1] != null && board [j, i].isWhite != board [j + 1, i + 1].isWhite) {
+							//check if next piece, in top right exists if not
+							//we are able to kill
+							if (j + 2 <= 7 && i + 2 <= 7) {
+								if (board [j + 2, i + 2] == null && isWhiteTurn == board[j, i].isWhite) {
+									forcedToMove.Add (board [j, i]);
 								}
 							}
 						}
 					}
+					//check if the top left exists and its different colour
+					if (j - 1 >= 0 && i + 1 <= 7) {  
+						if (board [j - 1, i + 1] != null && board [j, i].isWhite != board [j - 1, i + 1].isWhite) {
+							//check if next piece, in top right exists if not
+							//we are able to kill
+							if (j - 2 >= 0 && i + 2 <= 7) {
+								if (board [j - 2, i + 2] == null && isWhiteTurn == board[j, i].isWhite) {
+									forcedToMove.Add (board [j, i]);
+								}
+							}
+						}
+					}
+					//if there is a piece
+					//check if the bottom right exists and its different colour
+					if (j + 1 <= 7 && i - 1 >= 0) {
+						if (board [j + 1, i - 1] != null && board [j, i].isWhite != board [j + 1, i - 1].isWhite) {
+							//check if next piece, in top right exists if not
+							//we are able to kill
+							if (j + 2 <= 7 && i - 2 >= 0) {
+								if (board [j + 2, i - 2] == null && isWhiteTurn == board[j, i].isWhite) {
+									forcedToMove.Add (board [j, i]);
+								}
+							}
+						}
+					}
+					//check if the bottom left exists and its different colour
+					if (j - 1 >= 0 && i - 1 >= 0) {  
+						if (board [j - 1, i - 1] != null && board [j, i].isWhite != board [j - 1, i - 1].isWhite) {
+							//check if next piece, in top right exists if not
+							//we are able to kill
+							if (j - 2 >= 0 && i - 2 >= 0) {
+								if (board [j - 2, i - 2] == null && isWhiteTurn == board[j, i].isWhite) {
+									forcedToMove.Add (board [j, i]);
+								}
+							}
+						}
+					}
+				} else if (board [j, i] != null && board [j, i].isQueen) {
+					QueenScanningHelper(board[j, i]);
 				}
 			}
 		}
@@ -163,11 +162,11 @@ public class BoardManager : MonoBehaviour {
 	private void Scan(Piece p){
 		forcedToMove = new List<Piece> ();
 
-		if (isWhiteTurn && p.isWhite) {
+		if (!p.isQueen) {
 			//if top right is not out of bound
-			if(p.x + 1 <= 7 && p.y + 1 <= 7){
+			if (p.x + 1 <= 7 && p.y + 1 <= 7) {
 				//if top right is not null AND top right from investigated has different colour from investigated 
-				if(board[p.x + 1, p.y + 1] != null && board[p.x + 1, p.y + 1].isWhite != p.isWhite){
+				if (board [p.x + 1, p.y + 1] != null && board [p.x + 1, p.y + 1].isWhite != p.isWhite) {
 					if (p.x + 2 <= 7 && p.y + 2 <= 7) {
 						if (board [p.x + 1, p.y + 1] == null) {
 							forcedToMove.Add (p);
@@ -176,9 +175,9 @@ public class BoardManager : MonoBehaviour {
 				}
 			}
 			//if top left is not out of bound
-			if(p.x - 1 >= 0 && p.y + 1 <= 7){
-				//if top left is not null AND top right from investigated has different colour from investigated 
-				if(board[p.x - 1, p.y + 1] != null && board[p.x - 1, p.y + 1].isWhite != p.isWhite){
+			if (p.x - 1 >= 0 && p.y + 1 <= 7) {
+				//if top left is not null AND top left from investigated has different colour from investigated 
+				if (board [p.x - 1, p.y + 1] != null && board [p.x - 1, p.y + 1].isWhite != p.isWhite) {
 					if (p.x - 2 >= 0 && p.y + 2 <= 7) {
 						if (board [p.x - 2, p.y + 2] == null) {
 							forcedToMove.Add (p);
@@ -186,12 +185,12 @@ public class BoardManager : MonoBehaviour {
 					}
 				}
 			}
-		}
-		else if (!isWhiteTurn && !p.isWhite) {
+			//}
+			//else if (!isWhiteTurn && !p.isWhite) {
 			//if bottom right is not out of bound
-			if(p.x + 1 <= 7 && p.y - 1 >= 0){
-				//if bottom right is not null AND top right from investigated has different colour from investigated 
-				if(board[p.x + 1, p.y - 1] != null && board[p.x + 1, p.y - 1].isWhite != p.isWhite){
+			if (p.x + 1 <= 7 && p.y - 1 >= 0) {
+				//if bottom right is not null AND bottom right from investigated has different colour from investigated 
+				if (board [p.x + 1, p.y - 1] != null && board [p.x + 1, p.y - 1].isWhite != p.isWhite) {
 					if (p.x + 2 <= 7 && p.y - 2 >= 0) {
 						if (board [p.x + 1, p.y - 1] == null) {
 							forcedToMove.Add (p);
@@ -200,9 +199,9 @@ public class BoardManager : MonoBehaviour {
 				}
 			}
 			//if bottom left is not out of bound
-			if(p.x - 1 >= 0 && p.y - 1 >= 0){
-				//if top left is not null AND top right from investigated has different colour from investigated 
-				if(board[p.x - 1, p.y - 1] != null && board[p.x - 1, p.y - 1].isWhite != p.isWhite){
+			if (p.x - 1 >= 0 && p.y - 1 >= 0) {
+				//if bottom left is not null AND bottom left from investigated has different colour from investigated 
+				if (board [p.x - 1, p.y - 1] != null && board [p.x - 1, p.y - 1].isWhite != p.isWhite) {
 					if (p.x - 2 >= 0 && p.y - 2 >= 0) {
 						if (board [p.x - 2, p.y - 2] == null) {
 							forcedToMove.Add (p);
@@ -210,7 +209,59 @@ public class BoardManager : MonoBehaviour {
 					}
 				}
 			}
+		} else if (p.isQueen) {
+			QueenScanningHelper (p);
 		}
+	}
+	private void QueenScanningHelper(Piece p){
+			//right top
+			int y = p.y;
+			int j = p.x;
+			for (int x = j; x < 7 && y < 7; x++, y++) {
+				//if piece come across, piece which is different colour
+				if (board [x, y] != null && p.isWhite != board [x, y].isWhite) {
+					//check if behind this piece is empty place.
+					if (board [x + 1, y + 1] == null && isWhiteTurn == p.isWhite) {
+						forcedToMove.Add (p);
+					}
+				}
+			}
+			y = p.y;
+			j = p.x;
+			//left top
+			for (int x = j; x > 0 && y < 7; x--, y++) {
+				//if piece come across, piece which is different colour
+				if (board [x, y] != null && p.isWhite != board [x, y].isWhite) {
+					//check if behind this piece is empty place.
+					if (board [x - 1, y + 1] == null) {
+						forcedToMove.Add (p);
+					}
+				}
+			}
+			y = p.y;
+			j = p.x;
+			//right bottom
+			for (int x = j; x < 7 && y > 0; x++, y--) {
+				//if piece come across, piece which is different colour
+				if (board [x, y] != null && p.isWhite != board [x, y].isWhite) {
+					//check if behind this piece is empty place.
+					if (board [x + 1, y - 1] == null) {
+						forcedToMove.Add (p);
+					}
+				}
+			}
+			y = p.y;
+			j = p.x;
+			//left bottom
+			for (int x = j; x > 0 && y > 0; x--, y--) {
+				//if piece come across, piece which is different colour
+				if (board [x, y] != null && p.isWhite != board [x, y].isWhite) {
+					//check if behind this piece is empty place.
+					if (board [x - 1, y - 1] == null) {
+						forcedToMove.Add (p);
+					}
+				}
+			}
 	}
 /**************************************************************************/
 //MOVEMENT
@@ -232,53 +283,47 @@ public class BoardManager : MonoBehaviour {
 			Debug.Log ("Put back, because of button up was out of bound");
 			return;
 		}
-		//If the move is valid according to checkIfValidMove function
-		if (selectedPiece.checkIfValidMove (board, xS, yS, xE, yE, out killed, out killedPiece)) 
-		{
-			//changing x, y for piece object
-			selectedPiece.x = xE;
-			selectedPiece.y = yE;
-			//changing x,y for board 
-			board [xE, yE] = selectedPiece;
-			board [xS, yS] = null;
+		if (selectedPiece != null) {
+			//If the move is valid according to checkIfValidMove function
+			if (selectedPiece.checkIfValidMove (board, xS, yS, xE, yE, out killed, out killedPiece)) {
+				//changing x, y for piece object
+				selectedPiece.x = xE;
+				selectedPiece.y = yE;
+				//changing x,y for board 
+				board [xE, yE] = selectedPiece;
+				board [xS, yS] = null;
 
-			movePiece (selectedPiece, (int)endDrag.x, (int)endDrag.y);
-			if (killed == true) {
-				//scenario when piece, is killed by regular piece
-					//int midX = (xS + xE) / 2;
-					//int midY = (yS + yE) / 2;
-					//Piece killedPiece = board [midX, midY];
-					//board [midX, midY] = null;
-				board[killedPiece.x, killedPiece.y] = null;
-				Destroy (killedPiece.gameObject);
+				movePiece (selectedPiece, (int)endDrag.x, (int)endDrag.y);
+				if (killed == true) {
+					board [killedPiece.x, killedPiece.y] = null;
+					Destroy (killedPiece.gameObject);
 
-				startDrag = Vector2.zero;
-				Scan (selectedPiece);
+					startDrag = Vector2.zero;
+					Scan (selectedPiece);
 
-				CheckIfCanBeQueen (selectedPiece);
+					CheckIfCanBeQueen (selectedPiece);
 
-				if (forcedToMove.Count == 0 || selectedPiece.isQueen) {
-					EndTurn();
+					if (forcedToMove.Count == 0 || selectedPiece.isQueen) {
+						EndTurn ();
+					}
+					selectedPiece = null;
+					return;
 				}
-				selectedPiece = null;
-				Debug.Log (forcedToMove.Count);
+				CheckIfCanBeQueen (selectedPiece);
+				EndTurn ();
 				return;
 			}
-			CheckIfCanBeQueen (selectedPiece);
-			EndTurn ();
-			return;
-		}
 		//if the move is not valid, put back piece
 		//This also handles, putting up and putting back in the same place
-		else 
-		{
-			if (selectedPiece != null) {
-				movePiece (selectedPiece, (int)startDrag.x, (int)startDrag.y);
+		else {
+				if (selectedPiece != null) {
+					movePiece (selectedPiece, (int)startDrag.x, (int)startDrag.y);
+				}
+				startDrag = Vector2.zero;
+				selectedPiece = null;
+				Debug.Log ("Put back piece, because of invalid move or picked up and dropped");
+				return;
 			}
-			startDrag = Vector2.zero;
-			selectedPiece = null;
-			Debug.Log ("Put back piece, because of invalid move or picked up and dropped");
-			return;
 		}
 	}
 
@@ -356,6 +401,8 @@ public class BoardManager : MonoBehaviour {
 			isWhiteTurn = true;
 		}
 		Scan ();
-		Debug.Log (forcedToMove.Count);
+		foreach (var piece in forcedToMove) {
+			Debug.Log (piece.x + " " + piece.y);
+		}
 	}
 }
