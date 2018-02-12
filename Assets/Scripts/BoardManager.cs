@@ -22,7 +22,6 @@ public class BoardManager : MonoBehaviour {
 	private List<Piece> forcedToMove; 
 
 	//did piece, killed other piece?
-	private bool killed = false;
 	private Piece killedPiece;
 
 	//Turns
@@ -161,14 +160,14 @@ public class BoardManager : MonoBehaviour {
 	//Check if piece, which just killed can kill again
 	private void Scan(Piece p){
 		forcedToMove = new List<Piece> ();
-
 		if (!p.isQueen) {
 			//if top right is not out of bound
 			if (p.x + 1 <= 7 && p.y + 1 <= 7) {
 				//if top right is not null AND top right from investigated has different colour from investigated 
 				if (board [p.x + 1, p.y + 1] != null && board [p.x + 1, p.y + 1].isWhite != p.isWhite) {
+					//checking the boundaries
 					if (p.x + 2 <= 7 && p.y + 2 <= 7) {
-						if (board [p.x + 1, p.y + 1] == null) {
+						if (board [p.x + 2, p.y + 2] == null) {
 							forcedToMove.Add (p);
 						}
 					}
@@ -192,7 +191,7 @@ public class BoardManager : MonoBehaviour {
 				//if bottom right is not null AND bottom right from investigated has different colour from investigated 
 				if (board [p.x + 1, p.y - 1] != null && board [p.x + 1, p.y - 1].isWhite != p.isWhite) {
 					if (p.x + 2 <= 7 && p.y - 2 >= 0) {
-						if (board [p.x + 1, p.y - 1] == null) {
+						if (board [p.x + 2, p.y - 2] == null) {
 							forcedToMove.Add (p);
 						}
 					}
@@ -211,6 +210,9 @@ public class BoardManager : MonoBehaviour {
 			}
 		} else if (p.isQueen) {
 			QueenScanningHelper (p);
+		}
+		foreach (var piece in forcedToMove) {
+			Debug.Log (piece.x + " " + piece.y);
 		}
 	}
 	private void QueenScanningHelper(Piece p){
@@ -262,6 +264,9 @@ public class BoardManager : MonoBehaviour {
 					}
 				}
 			}
+		foreach (var piece in forcedToMove) {
+			Debug.Log (piece.x + " " + piece.y);
+		}
 	}
 /**************************************************************************/
 //MOVEMENT
@@ -285,7 +290,7 @@ public class BoardManager : MonoBehaviour {
 		}
 		if (selectedPiece != null) {
 			//If the move is valid according to checkIfValidMove function
-			if (selectedPiece.checkIfValidMove (board, xS, yS, xE, yE, out killed, out killedPiece)) {
+			if (selectedPiece.checkIfValidMove (board, xS, yS, xE, yE, out killedPiece)) {
 				//changing x, y for piece object
 				selectedPiece.x = xE;
 				selectedPiece.y = yE;
@@ -294,21 +299,31 @@ public class BoardManager : MonoBehaviour {
 				board [xS, yS] = null;
 
 				movePiece (selectedPiece, (int)endDrag.x, (int)endDrag.y);
-				if (killed == true) {
+				if (killedPiece != null) {
 					board [killedPiece.x, killedPiece.y] = null;
 					Destroy (killedPiece.gameObject);
 
+					//piece, killed. Can it become queen?
+					if (CheckIfCanBeQueen (selectedPiece)) {
+						//piece cannot move, right after it became queen.
+						selectedPiece = null;
+						EndTurn ();
+						return;
+					}
+					//piece killed.
 					startDrag = Vector2.zero;
-					Scan (selectedPiece);
-
-					CheckIfCanBeQueen (selectedPiece);
-
-					if (forcedToMove.Count == 0 || selectedPiece.isQueen) {
+					killedPiece = null;
+					//to prevent the dragging animation, selectedPiece need to be set as null after kill.
+					Piece placeholderPiece = selectedPiece;
+					selectedPiece = null;
+					//check if there is anything else to kill.
+					Scan (placeholderPiece);
+					if (forcedToMove.Count == 0) {
 						EndTurn ();
 					}
-					selectedPiece = null;
 					return;
 				}
+				//piece did not kill.
 				CheckIfCanBeQueen (selectedPiece);
 				EndTurn ();
 				return;
@@ -379,12 +394,14 @@ public class BoardManager : MonoBehaviour {
 	}
 /**************************************************************************/
 //MAKE QUEEN
-	private void CheckIfCanBeQueen(Piece p)
+	private bool CheckIfCanBeQueen(Piece p)
 	{
 		if (((selectedPiece.y == 0 && !selectedPiece.isWhite) || (selectedPiece.y == 7 && selectedPiece.isWhite)) && !selectedPiece.isQueen) {
 			board [selectedPiece.x, selectedPiece.y].isQueen = true;
 			p.transform.Rotate (Vector3.right * 180);
+			return true;
 		}
+		return false;
 	}
 /**************************************************************************/
 //END TURN
@@ -393,7 +410,6 @@ public class BoardManager : MonoBehaviour {
 		endDrag = Vector2.zero;
 		startDrag = Vector2.zero;
 		selectedPiece = null;
-		killed = false;
 
 		if (isWhiteTurn == true) {
 			isWhiteTurn = false;
@@ -401,8 +417,5 @@ public class BoardManager : MonoBehaviour {
 			isWhiteTurn = true;
 		}
 		Scan ();
-		foreach (var piece in forcedToMove) {
-			Debug.Log (piece.x + " " + piece.y);
-		}
 	}
 }

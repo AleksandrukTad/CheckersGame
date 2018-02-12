@@ -9,14 +9,14 @@ public class Piece : MonoBehaviour {
 	public bool isQueen;
 	public bool isWhite;
 
-	public bool checkIfValidMove(Piece[,] board, int xS, int yS, int xE, int yE, out bool killed, out Piece p){
+	public bool checkIfValidMove(Piece[,] board, int xS, int yS, int xE, int yE, out Piece p){
 		p = null;
 		//If we try to place piece, on top of another piece.
 		if (board [xE, yE] != null) {
 			Debug.Log ("Trying to place, piece on top of the other piece");
-			killed = false;
 			return false;
 		}
+
 		//INTERNATIONAL RULES
 		//Checks if we move piece diagonally
 		int deltaX = Mathf.Abs(xE - xS);
@@ -27,7 +27,6 @@ public class Piece : MonoBehaviour {
             {
                 if (Y == 1)
                 {
-					killed = false;
                     return true;
                 }
             }
@@ -41,7 +40,6 @@ public class Piece : MonoBehaviour {
 					if (board [midX, midY] != null || board [midX, midY].isWhite != isWhite) {
 						//kill
 						p = board [midX, midY];
-						killed = true;
 						return true;
 					}
                 }
@@ -53,7 +51,6 @@ public class Piece : MonoBehaviour {
 					if (board [midX, midY] != null || board [midX, midY].isWhite != isWhite) {
 						//kill
 						p = board [midX, midY];
-						killed = true;
 						return true;
 					}
 				}
@@ -65,7 +62,6 @@ public class Piece : MonoBehaviour {
 			if (deltaX == 1)
 			{
 				if (Y == -1){
-					killed = false;
 					return true;
 				}
 			}
@@ -79,7 +75,6 @@ public class Piece : MonoBehaviour {
 					if (board [midX, midY] != null || board [midX, midY].isWhite != isWhite) {
 						//kill
 						p = board [midX, midY];
-						killed = true;
 						return true;
 					}
 				}
@@ -92,7 +87,6 @@ public class Piece : MonoBehaviour {
 					if (board [midX, midY] != null || board [midX, midY].isWhite != isWhite) {
 						//kill
 						p = board [midX, midY];
-						killed = true;
 						return true;
 					}
 				}
@@ -108,7 +102,6 @@ public class Piece : MonoBehaviour {
 				//is "clear"
 				if (board [x, y] == null) {
 					if (x == xE && y == yE) {
-						killed = false;
 						return true;
 					}
 				}
@@ -118,7 +111,6 @@ public class Piece : MonoBehaviour {
 					if (board [x + 1, y + 1] == null) {
 						//check if player set destination to the field after that piece
 						if (xE == x + 1 && yE == y + 1) {
-							killed = true;
 							p = board [x, y];
 							return true;
 						}
@@ -128,7 +120,6 @@ public class Piece : MonoBehaviour {
 						for (int i = x + 1; board[i,j] == null; i++, j++) {
 								//check if scanned possition in "landing" position.
 							if (i == xE && j == yE) {
-								killed = true;
 								p = board [x, y];
 								return true;
 							}
@@ -143,7 +134,6 @@ public class Piece : MonoBehaviour {
 				//is "clear"
 				if (board [x, y] == null) {
 					if (x == xE && y == yE) {
-						killed = false;
 						return true;
 					}
 				}
@@ -152,12 +142,17 @@ public class Piece : MonoBehaviour {
 					//check if behind this piece is empty place.
 					//and check if player set destination to that field.
 					if (board [x - 1, y + 1] == null && xE == x - 1 && yE == y +1) {
-						killed = true;
 						p = board [x, y];
 						return true;
-					}else {
-						killed = false;
-						return false;
+					}
+					int j = y + 1;
+					//look for the next, piece going top right.
+					for (int i = x - 1; board[i,j] == null; i--, j++) {
+						//check if scanned possition in "landing" position.
+						if (i == xE && j == yE) {
+							p = board [x, y];
+							return true;
+						}
 					}
 				}
 			}
@@ -168,7 +163,6 @@ public class Piece : MonoBehaviour {
 				//is "clear"
 				if (board [x, y] == null) {
 					if (x == xE && y == yE) {
-						killed = false;
 						return true;
 					}
 				}
@@ -177,12 +171,17 @@ public class Piece : MonoBehaviour {
 					//check if behind this piece is empty place.
 					//and check if player set destination to that field.
 					if (board [x + 1, y - 1] == null && xE == x + 1 && yE == y - 1) {
-						killed = true;
 						p = board [x, y];
 						return true;
-					}else {
-						killed = false;
-						return false;
+					}
+					int j = y + 1;
+					//look for the next, piece going top right.
+					for (int i = x + 1; board[i,j] == null; i++, j--) {
+						//check if scanned possition in "landing" position.
+						if (i == xE && j == yE) {
+							p = board [x, y];
+							return true;
+						}
 					}
 				}
 			}
@@ -193,7 +192,6 @@ public class Piece : MonoBehaviour {
 				//is "clear"
 				if (board [x, y] == null) {
 					if (x == xE && y == yE) {
-						killed = false;
 						return true;
 					}
 				}
@@ -202,17 +200,21 @@ public class Piece : MonoBehaviour {
 					//check if behind this piece is empty place.
 					//and check if player set destination to that field.
 					if (board [x - 1, y - 1] == null && xE == x - 1 && yE == y - 1) {
-						killed = true;
 						p = board [x, y];
 						return true;
-					} else {
-						killed = false;
-						return false;
+					}
+					int j = y - 1;
+					//look for the next, piece going top right.
+					for (int i = x - 1; board[i,j] == null; i--, j--) {
+						//check if scanned possition in "landing" position.
+						if (i == xE && j == yE) {
+							p = board [x, y];
+							return true;
+						}
 					}
 				}
 			}
 		}
-		killed = false;
 		return false;	
 	}
 }
