@@ -16,7 +16,7 @@ public class BoardManager : MonoBehaviour {
 	private Vector2 mouseOver;
 
 	//Piece mechanics
-	private Piece selectedPiece;
+	public Piece selectedPiece;
 	private Vector2 startDrag;
 	private Vector2 endDrag;
 	private List<Piece> forcedToMove; 
@@ -26,6 +26,9 @@ public class BoardManager : MonoBehaviour {
 
 	//Turns
 	public bool isWhiteTurn = true;
+
+	[SerializeField]
+	private GameObject endScreen;
 
 	private void Start()
 	{
@@ -66,7 +69,7 @@ public class BoardManager : MonoBehaviour {
 		}
 	}
 
-	private void SelectPiece(int x, int y){
+	public void SelectPiece(int x, int y){
 		//if x and y is not out of bound
 		if (x >= 0 && x <= 7 && y >= 0 && y <= 7) 
 		{
@@ -94,7 +97,7 @@ public class BoardManager : MonoBehaviour {
 //UTILS
 	//Scan whole board to look for piece, that can kill
 	private void Scan(){
-		forcedToMove = new List<Piece> ();
+		forcedToMove.Clear ();
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
 				//check if scan will not go out of bounds
@@ -159,7 +162,7 @@ public class BoardManager : MonoBehaviour {
 	}
 	//Check if piece, which just killed can kill again
 	private void Scan(Piece p){
-		forcedToMove = new List<Piece> ();
+		forcedToMove.Clear ();
 		if (!p.isQueen) {
 			//if top right is not out of bound
 			if (p.x + 1 <= 7 && p.y + 1 <= 7) {
@@ -270,7 +273,7 @@ public class BoardManager : MonoBehaviour {
 	}
 /**************************************************************************/
 //MOVEMENT
-	private void AttemptToMove(int xS, int yS, int xE, int yE){
+	public void AttemptToMove(int xS, int yS, int xE, int yE){
 		//for multiplayer, we need to redefine those values.
 		startDrag = new Vector2 (xS, yS);
 		endDrag = new Vector2 (xE, yE);
@@ -360,7 +363,7 @@ public class BoardManager : MonoBehaviour {
 /**************************************************************************/
 //GENERATE BOARD
 	//Generating the board and pieces
-	private void GenerateBoard(){
+	public void GenerateBoard(){
 		//generate White team.
 		for (int y = 0; y < 3; y++) {
 			bool oddRow = (y % 2 == 0);
@@ -397,19 +400,25 @@ public class BoardManager : MonoBehaviour {
 	private bool CheckIfCanBeQueen(Piece p)
 	{
 		if (((selectedPiece.y == 0 && !selectedPiece.isWhite) || (selectedPiece.y == 7 && selectedPiece.isWhite)) && !selectedPiece.isQueen) {
-			board [selectedPiece.x, selectedPiece.y].isQueen = true;
-			p.transform.Rotate (Vector3.right * 180);
+			TurnIntoQueen (p);
 			return true;
 		}
 		return false;
 	}
-/**************************************************************************/
+	private void TurnIntoQueen (Piece p){
+		board [selectedPiece.x, selectedPiece.y].isQueen = true;
+		p.transform.Rotate (Vector3.right * 180);
+	}
+/************************************************************************/
 //END TURN
 	private void EndTurn()
 	{	
+		forcedToMove.Clear ();
 		endDrag = Vector2.zero;
 		startDrag = Vector2.zero;
 		selectedPiece = null;
+
+		CheckVictory ();
 
 		if (isWhiteTurn == true) {
 			isWhiteTurn = false;
@@ -417,5 +426,42 @@ public class BoardManager : MonoBehaviour {
 			isWhiteTurn = true;
 		}
 		Scan ();
+	}
+//CHECK VICTORY
+	private void CheckVictory(){
+		List<Piece> pieces = new List<Piece> ();
+		for (int i = 0; i < 8; i++) {
+			for (int j = 0; j < 8; j++) {
+				if (board [j, i] != null)
+					pieces.Add (board [j, i]);
+					
+			}
+		}
+		bool hasWhite = false;
+		bool hasBlack = false;
+
+		for (int i = 0; i < pieces.Count; i++) {
+			if (pieces [i].isWhite)
+				hasWhite = true;
+			else if (!pieces [i].isWhite)
+				hasBlack = true;
+		}
+		Debug.Log (pieces.Count);
+		if (!hasWhite)
+			Victory (false);
+		if (!hasBlack)
+			Victory (true);
+	}
+	private void Victory(bool isWhite){
+		if (isWhite)
+			Debug.Log ("White won!");
+		else
+			Debug.Log ("Black won!");
+		endScreen.SetActive (true);
+	}
+	public void RedirectToSurvey()
+	{
+		var testing = GameObject.Find ("GOTesting").GetComponent<Testing> ();
+		testing.redirectToSurvey ();
 	}
 }
