@@ -27,6 +27,8 @@ public class BoardManager : MonoBehaviour {
 	//Turns
 	public bool isWhiteTurn = true;
 
+	bool multipleMove = false;
+
 	[SerializeField]
 	private GameObject endScreen;
 
@@ -230,6 +232,10 @@ public class BoardManager : MonoBehaviour {
 					//check if behind this piece is empty place.
 					if (board [x + 1, y + 1] == null && isWhiteTurn == p.isWhite) {
 						forcedToMove.Add (p);
+					} else {
+						//To prevent situation, that queen is able to kill the piece behind the piece.
+						//explained: https://github.com/AleksandrukTad/CheckersGame/issues/5
+						return;
 					}
 				}
 			}
@@ -242,6 +248,8 @@ public class BoardManager : MonoBehaviour {
 					//check if behind this piece is empty place.
 					if (board [x - 1, y + 1] == null) {
 						forcedToMove.Add (p);
+					}else {
+						return;
 					}
 				}
 			}
@@ -254,6 +262,8 @@ public class BoardManager : MonoBehaviour {
 					//check if behind this piece is empty place.
 					if (board [x + 1, y - 1] == null) {
 						forcedToMove.Add (p);
+					}else {
+						return;
 					}
 				}
 			}
@@ -266,6 +276,8 @@ public class BoardManager : MonoBehaviour {
 					//check if behind this piece is empty place.
 					if (board [x - 1, y - 1] == null) {
 						forcedToMove.Add (p);
+					}else {
+						return;
 					}
 				}
 			}
@@ -279,7 +291,8 @@ public class BoardManager : MonoBehaviour {
 		//for multiplayer, we need to redefine those values.
 		startDrag = new Vector2 (xS, yS);
 		endDrag = new Vector2 (xE, yE);
-		selectedPiece = board [xS, yS];
+		if(xS > 0 && yS > 0)
+			selectedPiece = board [xS, yS];
 
 
 		//if its out of bond
@@ -295,7 +308,7 @@ public class BoardManager : MonoBehaviour {
 		}
 		if (selectedPiece != null) {
 			//If the move is valid according to checkIfValidMove function
-			if (selectedPiece.checkIfValidMove (board, xS, yS, xE, yE, out killedPiece)) {
+			if (selectedPiece.checkIfValidMove (board, xS, yS, xE, yE, multipleMove, out killedPiece)) {
 				//changing x, y for piece object
 				selectedPiece.x = xE;
 				selectedPiece.y = yE;
@@ -324,7 +337,11 @@ public class BoardManager : MonoBehaviour {
 					//check if there is anything else to kill.
 					Scan (placeholderPiece);
 					if (forcedToMove.Count == 0) {
+						multipleMove = false;
 						EndTurn ();
+					}
+					else{
+						multipleMove = true;
 					}
 					return;
 				}
@@ -416,8 +433,11 @@ public class BoardManager : MonoBehaviour {
 	private void EndTurn()
 	{	
 		forcedToMove.Clear ();
-		endDrag = Vector2.zero;
-		startDrag = Vector2.zero;
+		multipleMove = false;
+		endDrag.x = -1;
+		endDrag.y = -1;
+		startDrag.x = -1;
+		startDrag.y = -1;
 		selectedPiece = null;
 
 		CheckVictory ();
