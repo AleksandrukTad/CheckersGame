@@ -32,6 +32,7 @@ public class BoardManager : MonoBehaviour {
 
 	private void Start()
 	{
+		forcedToMove = new List<Piece> ();
 		GenerateBoard ();
 		Scan ();
 	}
@@ -98,6 +99,7 @@ public class BoardManager : MonoBehaviour {
 	//Scan whole board to look for piece, that can kill
 	private void Scan(){
 		forcedToMove.Clear ();
+
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
 				//check if scan will not go out of bounds

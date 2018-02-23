@@ -37,7 +37,7 @@ public class Piece : MonoBehaviour {
 					int midX = (xS + xE) / 2;
 					int midY = (yS + yE) / 2;
 					//if this point is not null and its not the same colour as selected piece
-					if (board [midX, midY] != null || board [midX, midY].isWhite != isWhite) {
+					if (board [midX, midY] != null && board [midX, midY].isWhite != isWhite) {
 						//kill
 						p = board [midX, midY];
 						return true;
@@ -48,7 +48,7 @@ public class Piece : MonoBehaviour {
 					int midX = (xS + xE) / 2;
 					int midY = (yS + yE) / 2;
 					//if this point is not null and its not the same colour as selected piece
-					if (board [midX, midY] != null || board [midX, midY].isWhite != isWhite) {
+					if (board [midX, midY] != null && board [midX, midY].isWhite != isWhite) {
 						//kill
 						p = board [midX, midY];
 						return true;
@@ -72,7 +72,7 @@ public class Piece : MonoBehaviour {
 					int midX = (xS + xE) / 2;
 					int midY = (yS + yE) / 2;
 					//if this point is not null and its not the same colour as selected piece
-					if (board [midX, midY] != null || board [midX, midY].isWhite != isWhite) {
+					if (board [midX, midY] != null && board [midX, midY].isWhite != isWhite) {
 						//kill
 						p = board [midX, midY];
 						return true;
@@ -84,7 +84,7 @@ public class Piece : MonoBehaviour {
 					int midX = (xS + xE) / 2;
 					int midY = (yS + yE) / 2;
 					//if this point is not null and its not the same colour as selected piece
-					if (board [midX, midY] != null || board [midX, midY].isWhite != isWhite) {
+					if (board [midX, midY] != null && board [midX, midY].isWhite != isWhite) {
 						//kill
 						p = board [midX, midY];
 						return true;
@@ -204,7 +204,7 @@ public class Piece : MonoBehaviour {
 						return true;
 					}
 					int j = y - 1;
-					//look for the next, piece going top right.
+					//look for the next, piece going down left.
 					for (int i = x - 1; board[i,j] == null; i--, j--) {
 						//check if scanned possition in "landing" position.
 						if (i == xE && j == yE) {
