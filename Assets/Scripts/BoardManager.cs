@@ -58,7 +58,6 @@ public class BoardManager : MonoBehaviour {
 				AttemptToMove ((int)startDrag.x, (int)startDrag.y, x, y);
 			}
 		}
-
 	}
 	private void MouseOver(){
 		RaycastHit hit;
@@ -223,64 +222,87 @@ public class BoardManager : MonoBehaviour {
 		}
 	}
 	private void QueenScanningHelper(Piece p){
-			//right top
-			int y = p.y;
-			int j = p.x;
-			for (int x = j; x < 7 && y < 7; x++, y++) {
-				//if piece come across, piece which is different colour
-				if (board [x, y] != null && p.isWhite != board [x, y].isWhite) {
-					//check if behind this piece is empty place.
-					if (board [x + 1, y + 1] == null && isWhiteTurn == p.isWhite) {
-						forcedToMove.Add (p);
-					} else {
-						//To prevent situation, that queen is able to kill the piece behind the piece.
-						//explained: https://github.com/AleksandrukTad/CheckersGame/issues/5
-						return;
-					}
-				}
-			}
-			y = p.y;
-			j = p.x;
-			//left top
-			for (int x = j; x > 0 && y < 7; x--, y++) {
-				//if piece come across, piece which is different colour
-				if (board [x, y] != null && p.isWhite != board [x, y].isWhite) {
-					//check if behind this piece is empty place.
-					if (board [x - 1, y + 1] == null) {
-						forcedToMove.Add (p);
-					}else {
-						return;
-					}
-				}
-			}
-			y = p.y;
-			j = p.x;
-			//right bottom
-			for (int x = j; x < 7 && y > 0; x++, y--) {
-				//if piece come across, piece which is different colour
-				if (board [x, y] != null && p.isWhite != board [x, y].isWhite) {
-					//check if behind this piece is empty place.
-					if (board [x + 1, y - 1] == null) {
-						forcedToMove.Add (p);
-					}else {
-						return;
-					}
-				}
-			}
-			y = p.y;
-			j = p.x;
-			//left bottom
-			for (int x = j; x > 0 && y > 0; x--, y--) {
-				//if piece come across, piece which is different colour
-				if (board [x, y] != null && p.isWhite != board [x, y].isWhite) {
-					//check if behind this piece is empty place.
-					if (board [x - 1, y - 1] == null) {
-						forcedToMove.Add (p);
-					}else {
-						return;
-					}
-				}
-			}
+        if (p.isWhite == isWhiteTurn)
+        {
+            //right top
+            int y = p.y;
+            int j = p.x;
+            for (int x = j; x < 7 && y < 7; x++, y++)
+            {
+                //if piece come across, piece which is different colour
+                if (board[x, y] != null && p.isWhite != board[x, y].isWhite)
+                {
+                    //check if behind this piece is empty place.
+                    if (board[x + 1, y + 1] == null && isWhiteTurn == p.isWhite)
+                    {
+                        forcedToMove.Add(p);
+                    }
+                    else
+                    {
+                        //To prevent situation, that queen is able to kill the piece behind the piece.
+                        //explained: https://github.com/AleksandrukTad/CheckersGame/issues/5
+                        return;
+                    }
+                }
+            }
+            y = p.y;
+            j = p.x;
+            //left top
+            for (int x = j; x > 0 && y < 7; x--, y++)
+            {
+                //if piece come across, piece which is different colour
+                if (board[x, y] != null && p.isWhite != board[x, y].isWhite)
+                {
+                    //check if behind this piece is empty place.
+                    if (board[x - 1, y + 1] == null)
+                    {
+                        forcedToMove.Add(p);
+                    }
+                    else
+                    {
+                        return;
+                    }
+                }
+            }
+            y = p.y;
+            j = p.x;
+            //right bottom
+            for (int x = j; x < 7 && y > 0; x++, y--)
+            {
+                //if piece come across, piece which is different colour
+                if (board[x, y] != null && p.isWhite != board[x, y].isWhite)
+                {
+                    //check if behind this piece is empty place.
+                    if (board[x + 1, y - 1] == null)
+                    {
+                        forcedToMove.Add(p);
+                    }
+                    else
+                    {
+                        return;
+                    }
+                }
+            }
+            y = p.y;
+            j = p.x;
+            //left bottom
+            for (int x = j; x > 0 && y > 0; x--, y--)
+            {
+                //if piece come across, piece which is different colour
+                if (board[x, y] != null && p.isWhite != board[x, y].isWhite)
+                {
+                    //check if behind this piece is empty place.
+                    if (board[x - 1, y - 1] == null)
+                    {
+                        forcedToMove.Add(p);
+                    }
+                    else
+                    {
+                        return;
+                    }
+                }
+            }
+        }
 		foreach (var piece in forcedToMove) {
 			Debug.Log (piece.x + " " + piece.y);
 		}
@@ -291,8 +313,9 @@ public class BoardManager : MonoBehaviour {
 		//for multiplayer, we need to redefine those values.
 		startDrag = new Vector2 (xS, yS);
 		endDrag = new Vector2 (xE, yE);
-		if(xS > 0 && yS > 0)
+		if (xS > 0 && yS > 0) {
 			selectedPiece = board [xS, yS];
+		}
 
 
 		//if its out of bond
@@ -301,66 +324,74 @@ public class BoardManager : MonoBehaviour {
 			if (selectedPiece != null) {
 				movePiece (selectedPiece, (int)startDrag.x, (int)startDrag.y);
 			}
-			startDrag = Vector2.zero;
+			startDrag.x = -1;
+			startDrag.y = -1;
 			selectedPiece = null;
 			Debug.Log ("Put back, because of button up was out of bound");
 			return;
 		}
 		if (selectedPiece != null) {
-			//If the move is valid according to checkIfValidMove function
-			if (selectedPiece.checkIfValidMove (board, xS, yS, xE, yE, multipleMove, out killedPiece)) {
-				//changing x, y for piece object
-				selectedPiece.x = xE;
-				selectedPiece.y = yE;
-				//changing x,y for board 
-				board [xE, yE] = selectedPiece;
-				board [xS, yS] = null;
+            //If the move is valid according to checkIfValidMove function
+            if (selectedPiece.checkIfValidMove(board, xS, yS, xE, yE, multipleMove, out killedPiece))
+            {
+                //changing x, y for piece object
+                selectedPiece.x = xE;
+                selectedPiece.y = yE;
+                //changing x,y for board 
+                board[xE, yE] = selectedPiece;
+                board[xS, yS] = null;
 
-				movePiece (selectedPiece, (int)endDrag.x, (int)endDrag.y);
-				if (killedPiece != null) {
-					board [killedPiece.x, killedPiece.y] = null;
-					Destroy (killedPiece.gameObject);
+                movePiece(selectedPiece, (int)endDrag.x, (int)endDrag.y);
+                if (killedPiece != null)
+                {
+                    board[killedPiece.x, killedPiece.y] = null;
+                    Destroy(killedPiece.gameObject);
 
-					//piece, killed. Can it become queen?
-					if (CheckIfCanBeQueen (selectedPiece)) {
-						//piece cannot move, right after it became queen.
-						selectedPiece = null;
-						EndTurn ();
-						return;
-					}
-					//piece killed.
-					startDrag = Vector2.zero;
-					killedPiece = null;
-					//to prevent the dragging animation, selectedPiece need to be set as null after kill.
-					Piece placeholderPiece = selectedPiece;
-					selectedPiece = null;
-					//check if there is anything else to kill.
-					Scan (placeholderPiece);
-					if (forcedToMove.Count == 0) {
-						multipleMove = false;
-						EndTurn ();
-					}
-					else{
-						multipleMove = true;
-					}
-					return;
-				}
-				//piece did not kill.
-				CheckIfCanBeQueen (selectedPiece);
-				EndTurn ();
-				return;
-			}
-		//if the move is not valid, put back piece
-		//This also handles, putting up and putting back in the same place
-		else {
-				if (selectedPiece != null) {
-					movePiece (selectedPiece, (int)startDrag.x, (int)startDrag.y);
-				}
-				startDrag = Vector2.zero;
-				selectedPiece = null;
-				Debug.Log ("Put back piece, because of invalid move or picked up and dropped");
-				return;
-			}
+                    //piece, killed. Can it become queen?
+                    if (CheckIfCanBeQueen(selectedPiece))
+                    {
+                        //piece cannot move, right after it became queen.
+                        selectedPiece = null;
+                        EndTurn();
+                        return;
+                    }
+                    killedPiece = null;
+                    //to prevent the dragging animation, selectedPiece need to be set as null after kill.
+                    Piece placeholderPiece = selectedPiece;
+                    selectedPiece = null;
+                    //check if there is anything else to kill.
+                    Scan(placeholderPiece);
+                    if (forcedToMove.Count == 0)
+                    {
+                        multipleMove = false;
+                        EndTurn();
+                    }
+                    else
+                    {
+                        multipleMove = true;
+                    }
+                    return;
+                }
+                //piece did not kill.
+                CheckIfCanBeQueen(selectedPiece);
+                EndTurn();
+                Scan();
+                return;
+            }
+            //if the move is not valid, put back piece
+            //This also handles, putting up and putting back in the same place
+            else
+            {
+                if (selectedPiece != null)
+                {
+                    movePiece(selectedPiece, (int)startDrag.x, (int)startDrag.y);
+                }
+                startDrag.x = -1;
+                startDrag.y = -1;
+                selectedPiece = null;
+                Debug.Log("Put back piece, because of invalid move or picked up and dropped");
+                return;
+            }
 		}
 	}
 
@@ -434,8 +465,6 @@ public class BoardManager : MonoBehaviour {
 	{	
 		forcedToMove.Clear ();
 		multipleMove = false;
-		endDrag.x = -1;
-		endDrag.y = -1;
 		startDrag.x = -1;
 		startDrag.y = -1;
 		selectedPiece = null;
@@ -447,7 +476,6 @@ public class BoardManager : MonoBehaviour {
 		} else {
 			isWhiteTurn = true;
 		}
-		Scan ();
 	}
 //CHECK VICTORY
 	private void CheckVictory(){

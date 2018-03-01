@@ -140,14 +140,21 @@ public class Piece : MonoBehaviour {
 					}
 					//if not look if the destination picked by player is valid
 					int j = y + 1;
-					//look for the next, piece going top right.
-					for (int i = x + 1; board [i, j] == null; i++, j++) {
-						//check if scanned possition in "landing" position.
-						if (i == xE && j == yE) {
-							p = board [x, y];
-							return true;
-						}
-					}
+                    //look for the next, piece going top right.
+                    for (int i = x + 1; i < 8; i++, j++)
+                    {
+                        if (board[i, j] != null)
+                        {
+                            return false;
+                        }
+                        //check if scanned possition in "landing" position.
+                        if (i == xE && j == yE)
+                        {
+                            p = board[x, y];
+                            return true;
+                        }
+
+                    }
 				} else if (board [x + 1, y + 1] != null) {
 					return false;
 				}
@@ -175,8 +182,12 @@ public class Piece : MonoBehaviour {
 					int j = y + 1;
 					//look for the next, piece going top right.
 					for (int i = x - 1; board [i, j] == null; i--, j++) {
-						//check if scanned possition in "landing" position.
-						if (i == xE && j == yE) {
+                        if (board[i, j] != null)
+                        {
+                            return false;
+                        }
+                        //check if scanned possition in "landing" position.
+                        if (i == xE && j == yE) {
 							p = board [x, y];
 							return true;
 						}
@@ -209,8 +220,12 @@ public class Piece : MonoBehaviour {
 					int j = y + 1;
 					//look for the next, piece going top right.
 					for (int i = x + 1; board [i, j] == null; i++, j--) {
-						//check if scanned possition in "landing" position.
-						if (i == xE && j == yE) {
+                        if (board[i, j] != null)
+                        {
+                            return false;
+                        }
+                        //check if scanned possition in "landing" position.
+                        if (i == xE && j == yE) {
 							p = board [x, y];
 							return true;
 						}
@@ -242,8 +257,12 @@ public class Piece : MonoBehaviour {
 					int j = y - 1;
 					//look for the next, piece going down left.
 					for (int i = x - 1; board [i, j] == null; i--, j--) {
-						//check if scanned possition in "landing" position.
-						if (i == xE && j == yE) {
+                        if (board[i, j] != null)
+                        {
+                            return false;
+                        }
+                        //check if scanned possition in "landing" position.
+                        if (i == xE && j == yE) {
 							p = board [x, y];
 							return true;
 						}
