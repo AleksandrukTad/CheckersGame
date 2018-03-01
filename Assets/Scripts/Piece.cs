@@ -8,7 +8,8 @@ public class Piece : MonoBehaviour {
 	public int y;
 	public bool isQueen;
 	public bool isWhite;
-
+    //legacy code
+    /*
 	public bool checkIfValidMove(Piece[,] board, int xS, int yS, int xE, int yE, bool multipleMove, out Piece p){
 		p = null;
 		//If we try to place piece, on top of another piece.
@@ -303,4 +304,5 @@ public class Piece : MonoBehaviour {
 		}
 		return false;
 	}
+    */
 }

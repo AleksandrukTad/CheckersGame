@@ -289,7 +289,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\BoardManager.cs" />
+    <Compile Include="Assets\Scripts\InternationalRules.cs" />
     <Compile Include="Assets\Scripts\Piece.cs" />
+    <Compile Include="Assets\Scripts\Rules.cs" />
     <Compile Include="Assets\Scripts\Testing.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
