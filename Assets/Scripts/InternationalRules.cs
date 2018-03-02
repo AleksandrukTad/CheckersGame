@@ -327,13 +327,13 @@ namespace Assets.Scripts
                         //check if player set destination to the field after that piece
                         if (destX == x + 1 && destY == y + 1)
                         {
-                            p = board[x, y];
+                            killedP = board[x, y];
                             return true;
                         }
                         //if not look if the destination picked by player is valid
                         int j = y + 1;
                         //look for the next, piece going top right.
-                        for (int i = x + 1; i < 8; i++, j++)
+                        for (int i = x + 1; i < 8 || j < 8; i++, j++)
                         {
                             if (board[i, j] != null)
                             {
@@ -342,7 +342,7 @@ namespace Assets.Scripts
                             //check if scanned possition in "landing" position.
                             if (i == destX && j == destY)
                             {
-                                p = board[x, y];
+                                killedP = board[x, y];
                                 return true;
                             }
 
@@ -376,12 +376,12 @@ namespace Assets.Scripts
                     {
                         if (destX == x - 1 && destY == y + 1)
                         {
-                            p = board[x, y];
+                            killedP = board[x, y];
                             return true;
                         }
                         int j = y + 1;
-                        //look for the next, piece going top right.
-                        for (int i = x - 1; board[i, j] == null; i--, j++)
+                        //look for the next, piece going top left.
+                        for (int i = x - 1; i >= 0 || j < 8; i--, j++)
                         {
                             if (board[i, j] != null)
                             {
@@ -390,7 +390,7 @@ namespace Assets.Scripts
                             //check if scanned possition in "landing" position.
                             if (i == destX && j == destY)
                             {
-                                p = board[x, y];
+                                killedP = board[x, y];
                                 return true;
                             }
                         }
@@ -424,12 +424,12 @@ namespace Assets.Scripts
                     {
                         if (destX == x + 1 && destY == y - 1)
                         {
-                            p = board[x, y];
+                            killedP = board[x, y];
                             return true;
                         }
                         int j = y + 1;
                         //look for the next, piece going top right.
-                        for (int i = x + 1; board[i, j] == null; i++, j--)
+                        for (int i = x + 1; i < 8 || j >= 0; i++, j--)
                         {
                             if (board[i, j] != null)
                             {
@@ -438,7 +438,7 @@ namespace Assets.Scripts
                             //check if scanned possition in "landing" position.
                             if (i == destX && j == destY)
                             {
-                                p = board[x, y];
+                                killedP = board[x, y];
                                 return true;
                             }
                         }
@@ -471,12 +471,12 @@ namespace Assets.Scripts
                     {
                         if (destX == x - 1 && destY == y - 1)
                         {
-                            p = board[x, y];
+                            killedP = board[x, y];
                             return true;
                         }
                         int j = y - 1;
                         //look for the next, piece going down left.
-                        for (int i = x - 1; board[i, j] == null; i--, j--)
+                        for (int i = x - 1; i >= 0 || j >= 0; i--, j--)
                         {
                             if (board[i, j] != null)
                             {
@@ -485,7 +485,7 @@ namespace Assets.Scripts
                             //check if scanned possition in "landing" position.
                             if (i == destX && j == destY)
                             {
-                                p = board[x, y];
+                                killedP = board[x, y];
                                 return true;
                             }
                         }

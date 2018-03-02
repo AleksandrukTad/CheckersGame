@@ -64,7 +64,11 @@ public class BoardManager : MonoBehaviour {
 				AttemptToMove ((int)startDrag.x, (int)startDrag.y, x, y);
 			}
 		}
-	}
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
+    }
 	private void MouseOver(){
 		RaycastHit hit;
 		if (Physics.Raycast (Camera.main.ScreenPointToRay (Input.mousePosition), out hit, 30.0f, LayerMask.GetMask ("Board"))) {
@@ -124,8 +128,8 @@ public class BoardManager : MonoBehaviour {
 		}
 		if (selectedPiece != null) {
             //If the move is valid according to checkIfValidMove function
-            if (selectedPiece.checkIfValidMove(board, xS, yS, xE, yE, multipleMove, out killedPiece))
-            //if(rules.checkIfValidMove(board, selectedPiece, xE, yE, multipleMove, out killedPiece))
+            //if (selectedPiece.checkIfValidMove(board, xS, yS, xE, yE, multipleMove, out killedPiece))
+            if(rules.checkIfValidMove(board, selectedPiece, xE, yE, multipleMove, out killedPiece))
             {
                 //changing x, y for piece object
                 selectedPiece.x = xE;
@@ -159,6 +163,7 @@ public class BoardManager : MonoBehaviour {
                     {
                         multipleMove = false;
                         EndTurn();
+                        forcedToMove = rules.ScanForAll(board, isWhiteTurn);
                     }
                     else
                     {
@@ -170,7 +175,7 @@ public class BoardManager : MonoBehaviour {
                 CheckIfCanBeQueen(selectedPiece);
                 EndTurn();
                 //Scan(board);
-                 forcedToMove = rules.ScanForAll(board, isWhiteTurn);
+                forcedToMove = rules.ScanForAll(board, isWhiteTurn);
                 return;
             }
             //if the move is not valid, put back piece
