@@ -12,6 +12,7 @@ public class BoardManager : MonoBehaviour {
     private Piece[,] board = new Piece[8, 8];
 	private Vector3 boardOffset = new Vector3(-4.0f, 0, -4.0f);
 	private Vector3 pieceOffset = new Vector3 (0.5f, 0, 0.5f);
+    private Board boardv2;
 
 	//Mouse
 	private Vector2 mouseOver;
@@ -37,9 +38,11 @@ public class BoardManager : MonoBehaviour {
 
 	private void Start()
 	{
+        boardv2 = gameObject.GetComponent<InternationalBoard>();
+        boardv2.GenerateBoard(whitePiecePrefab, blackPiecePrefab);
 		forcedToMove = new List<Piece> ();
         rules = new InternationalRules();
-		GenerateBoard ();
+		//GenerateBoard ();
         //Scan (board);
         forcedToMove = rules.ScanForAll(board, isWhiteTurn);
 

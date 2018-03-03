@@ -1,13 +1,29 @@
-﻿using System.Collections;
+﻿using Assets.Scripts;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Piece : MonoBehaviour {
+public class Piece : MonoBehaviour{
 
 	public int x;
 	public int y;
-	public bool isQueen;
+    public bool isQueen;
 	public bool isWhite;
+
+    public bool CheckIfCanBeQueen(Piece[,] board)
+    {
+        if (((this.y == 0 && !this.isWhite) || (this.y == 7 && this.isWhite)) && !this.isQueen)
+        {
+            TurnIntoQueen(board);
+            return true;
+        }
+        return false;
+    }
+    private void TurnIntoQueen(Piece[,] board)
+    {
+        board[this.x, this.y].isQueen = true;
+        this.transform.Rotate(Vector3.right * 180);
+    }
     //legacy code
     /*
 	public bool checkIfValidMove(Piece[,] board, int xS, int yS, int xE, int yE, bool multipleMove, out Piece p){
