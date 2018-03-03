@@ -8,7 +8,7 @@ public class Testing : MonoBehaviour {
 		try
 		{
 			Debug.Log("Redirecting...");
-			System.Diagnostics.Process.Start("https://goo.gl/forms/utONjYEMSjAGg7963");
+			System.Diagnostics.Process.Start("https://goo.gl/forms/qzzVA7Gi4VVuuZ2o1");
 		}
 		catch
 		{}
