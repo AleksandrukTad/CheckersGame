@@ -8,12 +8,8 @@ namespace Assets.Scripts
 {
     class InternationalRules : Rules
     {
-        private List<Piece> pieceList;
-        public InternationalRules()
-        {
-            pieceList = new List<Piece>();
-        }
         //Scanning whole board, to look for potential kills.
+        /*
         public override List<Piece> ScanForAll(Piece[,] board, bool isWhiteTurn)
         {
             pieceList.Clear();
@@ -96,7 +92,7 @@ namespace Assets.Scripts
                     }
                     else if (board[j, i] != null && board[j, i].isQueen)
                     {
-                        QueenScanningHelper(board[j, i], board, pieceList, isWhiteTurn);
+                        QueenScanningHelper(board[j, i], board, isWhiteTurn);
                     }
                 }
             }
@@ -106,92 +102,80 @@ namespace Assets.Scripts
         public override List<Piece> ScanForOne(Piece[,] board, Piece p, bool isWhiteTurn)
         {
             pieceList.Clear();
-
-            for (int i = 0; i < 8; i++)
+            if (!p.isQueen)
             {
-                for (int j = 0; j < 8; j++)
+                //if top right is not out of bound
+                if (p.x + 1 <= 7 && p.y + 1 <= 7)
                 {
-                    //check if scan will not go out of bounds
-                    if (board[j, i] != null && !board[j, i].isQueen)
+                    //if top right is not null AND top right from investigated has different colour from investigated 
+                    if (board[p.x + 1, p.y + 1] != null && board[p.x + 1, p.y + 1].isWhite != p.isWhite)
                     {
-                        //if its white turn
-                        //if (isWhiteTurn && board[j,i].isWhite) {
-                        //if there is a piece
-                        //check if the top right exists and its different colour
-                        if (j + 1 <= 7 && i + 1 <= 7)
+                        //checking the boundaries
+                        if (p.x + 2 <= 7 && p.y + 2 <= 7)
                         {
-                            if (board[j + 1, i + 1] != null && board[j, i].isWhite != board[j + 1, i + 1].isWhite)
+                            if (board[p.x + 2, p.y + 2] == null)
                             {
-                                //check if next piece, in top right exists if not
-                                //we are able to kill
-                                if (j + 2 <= 7 && i + 2 <= 7)
-                                {
-                                    if (board[j + 2, i + 2] == null && isWhiteTurn == board[j, i].isWhite)
-                                    {
-                                        pieceList.Add(board[j, i]);
-                                    }
-                                }
-                            }
-                        }
-                        //check if the top left exists and its different colour
-                        if (j - 1 >= 0 && i + 1 <= 7)
-                        {
-                            if (board[j - 1, i + 1] != null && board[j, i].isWhite != board[j - 1, i + 1].isWhite)
-                            {
-                                //check if next piece, in top right exists if not
-                                //we are able to kill
-                                if (j - 2 >= 0 && i + 2 <= 7)
-                                {
-                                    if (board[j - 2, i + 2] == null && isWhiteTurn == board[j, i].isWhite)
-                                    {
-                                        pieceList.Add(board[j, i]);
-                                    }
-                                }
-                            }
-                        }
-                        //if there is a piece
-                        //check if the bottom right exists and its different colour
-                        if (j + 1 <= 7 && i - 1 >= 0)
-                        {
-                            if (board[j + 1, i - 1] != null && board[j, i].isWhite != board[j + 1, i - 1].isWhite)
-                            {
-                                //check if next piece, in top right exists if not
-                                //we are able to kill
-                                if (j + 2 <= 7 && i - 2 >= 0)
-                                {
-                                    if (board[j + 2, i - 2] == null && isWhiteTurn == board[j, i].isWhite)
-                                    {
-                                        pieceList.Add(board[j, i]);
-                                    }
-                                }
-                            }
-                        }
-                        //check if the bottom left exists and its different colour
-                        if (j - 1 >= 0 && i - 1 >= 0)
-                        {
-                            if (board[j - 1, i - 1] != null && board[j, i].isWhite != board[j - 1, i - 1].isWhite)
-                            {
-                                //check if next piece, in top right exists if not
-                                //we are able to kill
-                                if (j - 2 >= 0 && i - 2 >= 0)
-                                {
-                                    if (board[j - 2, i - 2] == null && isWhiteTurn == board[j, i].isWhite)
-                                    {
-                                        pieceList.Add(board[j, i]);
-                                    }
-                                }
+                                pieceList.Add(p);
                             }
                         }
                     }
-                    else if (board[j, i] != null && board[j, i].isQueen)
+                }
+                //if top left is not out of bound
+                if (p.x - 1 >= 0 && p.y + 1 <= 7)
+                {
+                    //if top left is not null AND top left from investigated has different colour from investigated 
+                    if (board[p.x - 1, p.y + 1] != null && board[p.x - 1, p.y + 1].isWhite != p.isWhite)
                     {
-                        QueenScanningHelper(board[j, i], board, pieceList, isWhiteTurn);
+                        if (p.x - 2 >= 0 && p.y + 2 <= 7)
+                        {
+                            if (board[p.x - 2, p.y + 2] == null)
+                            {
+                                pieceList.Add(p);
+                            }
+                        }
+                    }
+                }
+                //}
+                //else if (!isWhiteTurn && !p.isWhite) {
+                //if bottom right is not out of bound
+                if (p.x + 1 <= 7 && p.y - 1 >= 0)
+                {
+                    //if bottom right is not null AND bottom right from investigated has different colour from investigated 
+                    if (board[p.x + 1, p.y - 1] != null && board[p.x + 1, p.y - 1].isWhite != p.isWhite)
+                    {
+                        if (p.x + 2 <= 7 && p.y - 2 >= 0)
+                        {
+                            if (board[p.x + 2, p.y - 2] == null)
+                            {
+                                pieceList.Add(p);
+                            }
+                        }
+                    }
+                }
+                //if bottom left is not out of bound
+                if (p.x - 1 >= 0 && p.y - 1 >= 0)
+                {
+                    //if bottom left is not null AND bottom left from investigated has different colour from investigated 
+                    if (board[p.x - 1, p.y - 1] != null && board[p.x - 1, p.y - 1].isWhite != p.isWhite)
+                    {
+                        if (p.x - 2 >= 0 && p.y - 2 >= 0)
+                        {
+                            if (board[p.x - 2, p.y - 2] == null)
+                            {
+                                pieceList.Add(p);
+                            }
+                        }
                     }
                 }
             }
+            else if (p.isQueen)
+            {
+                QueenScanningHelper(p, board, isWhiteTurn);
+            }
             return pieceList;
         }
-        public override bool checkIfValidMove(Piece[,] board, Piece p, int destX, int destY, bool multipleMove, out Piece killedP)
+        */
+        public override bool CheckIfValidMove(Piece[,] board, Piece p, int destX, int destY, bool multipleMove, out Piece killedP)
         {
             killedP = null;
             //If we try to place piece, on top of another piece.
@@ -207,23 +191,23 @@ namespace Assets.Scripts
             if (multipleMove == false)
             {
                 if (p.isWhite && !p.isQueen)
-                    return checkWhitePiece(board, p, destX, destY, out killedP, deltaX, deltaY);
+                    return CheckWhitePiece(board, p, destX, destY, out killedP, deltaX, deltaY);
                 else if (!p.isWhite && !p.isQueen)
-                    return checkBlackPiece(board, p, destX, destY, out killedP, deltaX, deltaY);
+                    return CheckBlackPiece(board, p, destX, destY, out killedP, deltaX, deltaY);
                 if (p.isQueen)
-                    return checkQueen(board, p, destX, destY, out killedP, multipleMove);
+                    return CheckQueen(board, p, destX, destY, out killedP, multipleMove);
 
             }
             else if (multipleMove == true)
             {
                 if (!p.isQueen)
-                    return checkMultipleMovePiece(board, p, destX, destY, out killedP, deltaX, deltaY);
+                    return CheckMultipleMovePiece(board, p, destX, destY, out killedP, deltaX, deltaY);
                 else
-                    return checkQueen(board, p, destX, destY, out killedP, multipleMove);
+                    return CheckQueen(board, p, destX, destY, out killedP, multipleMove);
             }
             return false;
         }
-        private bool checkWhitePiece(Piece[,] board, Piece p, int destX, int destY, out Piece killedP, int deltaX, int deltaY)
+        private bool CheckWhitePiece(Piece[,] board, Piece p, int destX, int destY, out Piece killedP, int deltaX, int deltaY)
         {
             killedP = null;
             if (deltaX == 1)
@@ -262,7 +246,7 @@ namespace Assets.Scripts
             }
             return false;
         }
-        private bool checkBlackPiece(Piece[,] board, Piece p, int destX, int destY, out Piece killedP, int deltaX, int deltaY)
+        private bool CheckBlackPiece(Piece[,] board, Piece p, int destX, int destY, out Piece killedP, int deltaX, int deltaY)
         {
             killedP = null;
             if (deltaX == 1)
@@ -302,7 +286,7 @@ namespace Assets.Scripts
             }
             return false;
         }
-        private bool checkQueen(Piece[,] board, Piece p, int destX, int destY, out Piece killedP, bool multipleMove)
+        private bool CheckQueen(Piece[,] board, Piece p, int destX, int destY, out Piece killedP, bool multipleMove)
         {
             killedP = null;
             int y = p.y;
@@ -396,7 +380,7 @@ namespace Assets.Scripts
                         }
                         //To prevent jumping over two pieces
                     }
-                    else if (board[x + 1, y + 1] != null)
+                    else if (board[x - 1, y + 1] != null)
                     {
                         return false;
                     }
@@ -427,8 +411,8 @@ namespace Assets.Scripts
                             killedP = board[x, y];
                             return true;
                         }
-                        int j = y + 1;
-                        //look for the next, piece going top right.
+                        int j = y - 1;
+                        //look for the next, piece going down right.
                         for (int i = x + 1; i < 8 || j >= 0; i++, j--)
                         {
                             if (board[i, j] != null)
@@ -443,7 +427,7 @@ namespace Assets.Scripts
                             }
                         }
                     }
-                    else if (board[x + 1, y + 1] != null)
+                    else if (board[x + 1, y - 1] != null)
                     {
                         return false;
                     }
@@ -490,7 +474,7 @@ namespace Assets.Scripts
                             }
                         }
                     }
-                    else if (board[x + 1, y + 1] != null)
+                    else if (board[x - 1, y - 1] != null)
                     {
                         return false;
                     }
@@ -498,7 +482,7 @@ namespace Assets.Scripts
             }
             return false;
         }
-        private bool checkMultipleMovePiece(Piece[,] board, Piece p, int destX, int destY, out Piece killedP, int deltaX, int deltaY)
+        private bool CheckMultipleMovePiece(Piece[,] board, Piece p, int destX, int destY, out Piece killedP, int deltaX, int deltaY)
         {
             killedP = null;
             if (deltaX == 2)
@@ -529,90 +513,6 @@ namespace Assets.Scripts
                 }
             }
             return false;
-        }
-        private void QueenScanningHelper(Piece p, Piece[,] board, List<Piece> forcedToMove, bool isWhiteTurn)
-        {
-            if (p.isWhite == isWhiteTurn)
-            {
-                //right top
-                int y = p.y;
-                int j = p.x;
-                for (int x = j; x < 7 && y < 7; x++, y++)
-                {
-                    //if piece come across, piece which is different colour
-                    if (board[x, y] != null && p.isWhite != board[x, y].isWhite)
-                    {
-                        //check if behind this piece is empty place.
-                        if (board[x + 1, y + 1] == null && isWhiteTurn == p.isWhite)
-                        {
-                            forcedToMove.Add(p);
-                        }
-                        else
-                        {
-                            //To prevent situation, that queen is able to kill the piece behind the piece.
-                            //explained: https://github.com/AleksandrukTad/CheckersGame/issues/5
-                            return;
-                        }
-                    }
-                }
-                y = p.y;
-                j = p.x;
-                //left top
-                for (int x = j; x > 0 && y < 7; x--, y++)
-                {
-                    //if piece come across, piece which is different colour
-                    if (board[x, y] != null && p.isWhite != board[x, y].isWhite)
-                    {
-                        //check if behind this piece is empty place.
-                        if (board[x - 1, y + 1] == null)
-                        {
-                            forcedToMove.Add(p);
-                        }
-                        else
-                        {
-                            return;
-                        }
-                    }
-                }
-                y = p.y;
-                j = p.x;
-                //right bottom
-                for (int x = j; x < 7 && y > 0; x++, y--)
-                {
-                    //if piece come across, piece which is different colour
-                    if (board[x, y] != null && p.isWhite != board[x, y].isWhite)
-                    {
-                        //check if behind this piece is empty place.
-                        if (board[x + 1, y - 1] == null)
-                        {
-                            forcedToMove.Add(p);
-                        }
-                        else
-                        {
-                            return;
-                        }
-                    }
-                }
-                y = p.y;
-                j = p.x;
-                //left bottom
-                for (int x = j; x > 0 && y > 0; x--, y--)
-                {
-                    //if piece come across, piece which is different colour
-                    if (board[x, y] != null && p.isWhite != board[x, y].isWhite)
-                    {
-                        //check if behind this piece is empty place.
-                        if (board[x - 1, y - 1] == null)
-                        {
-                            forcedToMove.Add(p);
-                        }
-                        else
-                        {
-                            return;
-                        }
-                    }
-                }
-            }
         }
     }
 }

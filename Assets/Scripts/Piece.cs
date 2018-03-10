@@ -3,23 +3,23 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Piece : MonoBehaviour{
+public class Piece : MonoBehaviour
+{
 
 	public int x;
 	public int y;
     public bool isQueen;
 	public bool isWhite;
 
-    public bool CheckIfCanBeQueen(Piece[,] board)
+    public bool CheckIfCanBeQueen()
     {
         if (((this.y == 0 && !this.isWhite) || (this.y == 7 && this.isWhite)) && !this.isQueen)
         {
-            TurnIntoQueen(board);
             return true;
         }
         return false;
     }
-    private void TurnIntoQueen(Piece[,] board)
+    public void TurnIntoQueen(Piece[,] board)
     {
         board[this.x, this.y].isQueen = true;
         this.transform.Rotate(Vector3.right * 180);
