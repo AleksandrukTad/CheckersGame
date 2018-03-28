@@ -13,6 +13,7 @@ public class Client : MonoBehaviour {
 	private StreamWriter writer;
 	private StreamReader reader;
 	public string clientName;
+	public bool isHost = false;
 
 	private List<GameClient> players = new List<GameClient>();
 
@@ -54,7 +55,7 @@ public class Client : MonoBehaviour {
 	}
 
 	//Sending Message to the server
-	private void Send(string data){
+	public void Send(string data){
 		if (!socketReady)
 			return;
 
@@ -72,12 +73,14 @@ public class Client : MonoBehaviour {
 			for (int i = 1; i < aData.Length - 1; i++) {
 				UserConnected (aData [i], false);
 			}
-			Send ("CWHO|" + this.clientName);
+			Send ("CWHO|" + this.clientName + "|" + ((isHost)?1:0).ToString());
 			break;
 		case "SombodyConnected":
 			UserConnected (aData [1], false);
 			break;
-
+		case "SMOVE":
+			GameManager.Instance.AttemptToMove (int.Parse (aData [1]), int.Parse (aData [2]), int.Parse (aData [3]), int.Parse (aData [4]));
+			break;
 		}
 	}
 

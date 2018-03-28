@@ -13,7 +13,7 @@ namespace Assets.Scripts
             board = new Piece[8, 8];
             pieceList = new List<Piece>();
         }
-        public override List<Piece> ScanForAll(bool isWhiteTurn)
+        public override List<Piece> ScanForAll(bool isWhite)
         {
             pieceList.Clear();
 
@@ -22,7 +22,7 @@ namespace Assets.Scripts
                 for (int j = 0; j < 8; j++)
                 {
                     //check if scan will not go out of bounds
-                    if (board[j, i] != null && !board[j, i].isQueen && board[j, i].isWhite == isWhiteTurn)
+                    if (board[j, i] != null && !board[j, i].isQueen && board[j, i].isWhite == isWhite)
                     {
                         //if its white turn
                         //if (isWhiteTurn && board[j,i].isWhite) {
@@ -36,7 +36,7 @@ namespace Assets.Scripts
                                 //we are able to kill
                                 if (j + 2 <= 7 && i + 2 <= 7)
                                 {
-                                    if (board[j + 2, i + 2] == null && isWhiteTurn == board[j, i].isWhite)
+                                    if (board[j + 2, i + 2] == null && isWhite == board[j, i].isWhite)
                                     {
                                         pieceList.Add(board[j, i]);
                                     }
@@ -52,7 +52,7 @@ namespace Assets.Scripts
                                 //we are able to kill
                                 if (j - 2 >= 0 && i + 2 <= 7)
                                 {
-                                    if (board[j - 2, i + 2] == null && isWhiteTurn == board[j, i].isWhite)
+                                    if (board[j - 2, i + 2] == null && isWhite == board[j, i].isWhite)
                                     {
                                         pieceList.Add(board[j, i]);
                                     }
@@ -69,7 +69,7 @@ namespace Assets.Scripts
                                 //we are able to kill
                                 if (j + 2 <= 7 && i - 2 >= 0)
                                 {
-                                    if (board[j + 2, i - 2] == null && isWhiteTurn == board[j, i].isWhite)
+                                    if (board[j + 2, i - 2] == null && isWhite == board[j, i].isWhite)
                                     {
                                         pieceList.Add(board[j, i]);
                                     }
@@ -85,7 +85,7 @@ namespace Assets.Scripts
                                 //we are able to kill
                                 if (j - 2 >= 0 && i - 2 >= 0)
                                 {
-                                    if (board[j - 2, i - 2] == null && isWhiteTurn == board[j, i].isWhite)
+                                    if (board[j - 2, i - 2] == null && isWhite == board[j, i].isWhite)
                                     {
                                         pieceList.Add(board[j, i]);
                                     }
@@ -95,7 +95,7 @@ namespace Assets.Scripts
                     }
                     else if (board[j, i] != null && board[j, i].isQueen)
                     {
-                        QueenScanningHelper(board[j, i],isWhiteTurn);
+                        QueenScanningHelper(board[j, i],isWhite);
                     }
                 }
             }

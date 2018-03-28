@@ -13,8 +13,8 @@ namespace Assets.Scripts
         public Vector3 boardOffset = new Vector3(-4.0f, 0, -4.0f);
         public Vector3 pieceOffset = new Vector3(0.5f, 0, 0.5f);
 
-        public abstract List<Piece> ScanForAll(bool isWhiteTurn);
-        public abstract List<Piece> ScanForOne(Piece p, bool isWhiteTurn);
+        public abstract List<Piece> ScanForAll(bool isWhite);
+        public abstract List<Piece> ScanForOne(Piece p, bool isWhite);
         public abstract void GenerateBoard(GameObject whitePiecePrefab, GameObject blackPiecePrefab);
         public void MovePiece(Piece p, int x, int y)
         {

@@ -113,11 +113,16 @@ public class Server : MonoBehaviour {
 	{
 		Debug.Log ("Server: " + data);
 		string[] aData = data.Split ('|');
-
+		c.isHost = (aData [2] == "0") ? false : true;
 		switch (aData [0]) {
 		case "CWHO":
 			c.clientName = aData [1];
 			Broadcast ("SombodyConnected|" + c.clientName, clients);
+			break;
+		
+		case "CMOVE":
+			Debug.Log (data);
+			Broadcast ("SMOVE|" + aData [1] + "|" + aData [2] + "|" + aData [3] + "|" + aData [4], clients);
 			break;
 		}
 	}
@@ -127,7 +132,7 @@ public class ServerClient
 {
 	public string clientName;
 	public TcpClient tcp;
-
+	public bool isHost;
 	public ServerClient (TcpClient tcp)
 	{
 		this.tcp = tcp;

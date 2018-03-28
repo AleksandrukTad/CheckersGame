@@ -42,6 +42,7 @@ public class ManuManager : MonoBehaviour {
 			/////////////
 			if(c.clientName == "")
 				c.clientName = "Host";
+			c.isHost = true;
 			c.ConnectToServer("127.0.0.1", 6321);
 
 		}catch(Exception e) {
