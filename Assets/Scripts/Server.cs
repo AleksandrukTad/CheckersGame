@@ -53,6 +53,7 @@ public class Server : MonoBehaviour {
 			server.Start();
 			//listening for incomming connections
 			StartListening();
+			serverStarted = true;
 		}
 		catch(Exception e) {
 			Debug.Log ("Socket error: " + e.Message);
@@ -63,11 +64,18 @@ public class Server : MonoBehaviour {
 	}
 	private void AcceptTcpClient(IAsyncResult ar){
 		TcpListener listener = (TcpListener)ar.AsyncState;
+
+		string allUsers = "";
+		foreach (ServerClient c in clients) {
+			allUsers += c.clientName + '|';
+		}
 		ServerClient sc = new ServerClient (listener.EndAcceptTcpClient (ar));
 		clients.Add (sc);
+
 		//tell server to comeback to listening, because after the ServerClient is added, server "forgets" to go back to listening
 		StartListening();
-		Debug.Log ("Somebody has connected!");
+
+		Broadcast ("SWHO|" + allUsers, clients [clients.Count - 1]);
 	}
 	private bool IsConnected(TcpClient c){
 		try{
@@ -82,7 +90,7 @@ public class Server : MonoBehaviour {
 		}
 	}
 	//Send from server
-	private void Boardcast(string data, List<ServerClient> cl)
+	private void Broadcast(string data, List<ServerClient> cl)
 	{
 		foreach (var sc in cl) {
 			try{
@@ -95,10 +103,23 @@ public class Server : MonoBehaviour {
 			}
 		}
 	}
+	private void Broadcast(string data, ServerClient cl)
+	{
+		List<ServerClient> sc = new List<ServerClient> { cl };
+		Broadcast (data, sc);
+	}
 	//Server Read
 	private void OnIncomingData(ServerClient c, string data)
 	{
-		Debug.Log (c.clientName + " : " + data);
+		Debug.Log ("Server: " + data);
+		string[] aData = data.Split ('|');
+
+		switch (aData [0]) {
+		case "CWHO":
+			c.clientName = aData [1];
+			Broadcast ("SombodyConnected|" + c.clientName, clients);
+			break;
+		}
 	}
 }
 

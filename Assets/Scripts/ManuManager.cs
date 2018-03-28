@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,6 +19,7 @@ public class ManuManager : MonoBehaviour {
 
 	private void Awake()
 	{
+		Instance = this;
 		hostMenu.SetActive (false);
 		connectMenu.SetActive (false);
 		DontDestroyOnLoad (gameObject);
@@ -35,7 +37,11 @@ public class ManuManager : MonoBehaviour {
 			s.init();
 
 			Client c = Instantiate(clientPrefab).GetComponent<Client>();
+			///This part is broken
 			c.clientName = nameInput.text;
+			/////////////
+			if(c.clientName == "")
+				c.clientName = "Host";
 			c.ConnectToServer("127.0.0.1", 6321);
 
 		}catch(Exception e) {
@@ -53,6 +59,9 @@ public class ManuManager : MonoBehaviour {
 		try
 		{
 			Client c = Instantiate(clientPrefab).GetComponent<Client>();
+			c.clientName = nameInput.text;
+			if(c.clientName == "")
+				c.clientName = "Player";
 			c.ConnectToServer(hostAddress, 6321);
 			connectMenu.SetActive(false);
 		}
@@ -72,5 +81,9 @@ public class ManuManager : MonoBehaviour {
 			Destroy (s);
 		if (c != null)
 			Destroy (c);
+	}
+	public void StartGame()
+	{
+		SceneManager.LoadScene ("Game");
 	}
 }

@@ -51,3 +51,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d93015af7e2b58b44af0023a115d6488, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  clientName: Host
