@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour {
 
@@ -27,12 +29,13 @@ public class GameManager : MonoBehaviour {
 	private Piece killedPiece;
 
 	//Turns
-	public bool isWhite = true;
+	private bool isWhiteTurn;
 	private bool multipleMove = false;
 
 	//online
-	private Client client;
-	private bool isWhiteTurn;
+	public Client client;
+	public bool isWhite;
+
 
     [SerializeField]
 	private GameObject endScreen;
@@ -44,19 +47,21 @@ public class GameManager : MonoBehaviour {
 	{
 		Instance = this;
 		client = FindObjectOfType<Client> ();
-		isWhite = client.isHost;
+		if(client)
+			isWhite = client.isHost;
 		isWhiteTurn = true;
         board = gameObject.GetComponent<InternationalBoard>();
         rules = new InternationalRules();
         forcedToMove = new List<Piece> ();
         board.GenerateBoard(whitePiecePrefab, blackPiecePrefab);
-        forcedToMove = board.ScanForAll(isWhite);
+        forcedToMove = board.ScanForAll(isWhiteTurn);
 
     }
 	private void Update(){
 		
 		MouseOver ();
 		//Here will we have tu check if its my turn
+
 		if((isWhite)?isWhiteTurn:!isWhiteTurn)
 		{
 			if (selectedPiece != null) {
@@ -99,7 +104,7 @@ public class GameManager : MonoBehaviour {
             //When forcedToMove is not empty, we have to check if piece which is going to be selected,
             //is inside forcedToMove.
             if (forcedToMove.Count != 0) {
-				if (p != null && p.isWhite == isWhite && forcedToMove.Any (piece => piece == p)) {
+				if (p != null && (p.isWhite == isWhite) && forcedToMove.Any (piece => piece == p)) {
 					selectedPiece = p;
 					startDrag = new Vector2 (selectedPiece.x, selectedPiece.y);
 					Debug.Log ("piece selected");
@@ -107,7 +112,7 @@ public class GameManager : MonoBehaviour {
 			}
 			//if forcedToMove is empty then we can pick whatever we want!
 			else {
-				if (p != null && p.isWhite == isWhite) {
+				if (p != null && (p.isWhite == isWhite)) {
 					selectedPiece = p;
 					startDrag = new Vector2 (selectedPiece.x, selectedPiece.y);
 					Debug.Log ("piece selected");
@@ -119,7 +124,7 @@ public class GameManager : MonoBehaviour {
 		//for multiplayer, we need to redefine those values.
 		startDrag = new Vector2 (xS, yS);
 		endDrag = new Vector2 (xE, yE);
-		if (xS > 0 && yS > 0) {
+		if (xS >= 0 && yS >= 0) {
             //selectedPiece = board[xS, yS];
             selectedPiece = board.board [xS, yS];
 		}
@@ -175,12 +180,12 @@ public class GameManager : MonoBehaviour {
 					//sending move to server
 					SendData(startDrag, endDrag);
 					//
-                    forcedToMove = board.ScanForOne(placeholderPiece, isWhite);
+                    forcedToMove = board.ScanForOne(placeholderPiece, isWhiteTurn);
                     if (forcedToMove.Count == 0)
                     {
                         multipleMove = false;
                         EndTurn();
-                        forcedToMove = board.ScanForAll(isWhite);
+                        forcedToMove = board.ScanForAll(isWhiteTurn);
                     }
                     else
                     {
@@ -189,13 +194,15 @@ public class GameManager : MonoBehaviour {
                     return;
                 }
                 //piece did not kill.
-                if(selectedPiece.CheckIfCanBeQueen())
+				if (selectedPiece.CheckIfCanBeQueen ()) {
+					SendData(startDrag, endDrag);
 					//sending move and queen info to server
 					//
-                    selectedPiece.TurnIntoQueen(board.board);
+					selectedPiece.TurnIntoQueen (board.board);
+				}
 				SendData(startDrag, endDrag);
                 EndTurn();
-                forcedToMove = board.ScanForAll(isWhite);
+                forcedToMove = board.ScanForAll(isWhiteTurn);
                 return;
             }
             //if the move is not valid, put back piece
@@ -235,19 +242,22 @@ public class GameManager : MonoBehaviour {
 		startDrag.x = -1;
 		startDrag.y = -1;
 		selectedPiece = null;
-
+		CheckVictory ();
 		isWhiteTurn = !isWhiteTurn;
-		//CheckVictory ();
+		if (!client)
+			isWhite = !isWhite;
 	}
 //SEND PIECE
 	private void SendData(Vector2 startDrag, Vector2 endDrag)
 	{
-		string msg = "CMOVE|";
-		msg += startDrag.x.ToString() + "|";
-		msg += startDrag.y.ToString() + "|";
-		msg += endDrag.x.ToString() + "|";
-		msg += endDrag.y.ToString ();
-		client.Send (msg);
+		if (client) {
+			string msg = "CMOVE|";
+			msg += startDrag.x.ToString () + "|";
+			msg += startDrag.y.ToString () + "|";
+			msg += endDrag.x.ToString () + "|";
+			msg += endDrag.y.ToString ();
+			client.Send (msg);
+		}
 	}
 //CHECK VICTORY
 	private void CheckVictory(){
@@ -270,7 +280,7 @@ public class GameManager : MonoBehaviour {
 			else if (!pieces [i].isWhite)
 				hasBlack = true;
 		}
-		Debug.Log (pieces.Count);
+		WhoWon (true);
 		if (!hasWhite)
 			Victory (false);
 		if (!hasBlack)
@@ -281,12 +291,21 @@ public class GameManager : MonoBehaviour {
 			Debug.Log ("White won!");
 		else
 			Debug.Log ("Black won!");
+		
+	}
+	private void WhoWon(bool isWhite)
+	{
+		if (isWhite == true) {
+			endScreen.GetComponentInChildren<Text> ().text = "Congratulations white player won!";
+		} else if (isWhite == false) {
+			endScreen.GetComponentInChildren<Text> ().text = "Congratulations black player won!";
+		}
 		endScreen.SetActive (true);
 	}
-	public void RedirectToSurvey()
+	public void MainMenu()
 	{
-        Debug.Log("Redirect");
-		var testing = GameObject.Find ("Surveys").GetComponent<Testing> ();
-		testing.redirectToSurvey ();
+		Destroy (GameObject.Find ("MenuManager"));
+		SceneManager.LoadScene ("Menu");
+
 	}
 }

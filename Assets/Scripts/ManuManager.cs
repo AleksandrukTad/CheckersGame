@@ -76,12 +76,15 @@ public class ManuManager : MonoBehaviour {
 		connectMenu.SetActive (false);
 		mainMenu.SetActive (true);
 
-		Server s = FindObjectOfType<Server> ();
-		Client c = FindObjectOfType<Client> ();
+		var s = GameObject.Find ("Server(Clone)");
+		var c = GameObject.Find ("Client(Clone)");
 		if(s != null)
 			Destroy (s);
 		if (c != null)
 			Destroy (c);
+	}
+	public void HotseatBtn(){
+		SceneManager.LoadScene ("Game");
 	}
 	public void StartGame()
 	{

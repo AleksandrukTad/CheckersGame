@@ -65,7 +65,7 @@ public class Client : MonoBehaviour {
 	//Read messages from the server
 	private void OnIncomingData(string data)
 	{
-		Debug.Log ("Client: " + data);
+		//Debug.Log ("Client: " + data);
 		string[] aData = data.Split ('|');
 		switch (aData [0]) 
 		{
@@ -79,7 +79,9 @@ public class Client : MonoBehaviour {
 			UserConnected (aData [1], false);
 			break;
 		case "SMOVE":
+			Debug.Log (aData [1] + " " + aData [2] + " " + aData [3] + " " + aData [4]);
 			GameManager.Instance.AttemptToMove (int.Parse (aData [1]), int.Parse (aData [2]), int.Parse (aData [3]), int.Parse (aData [4]));
+			Debug.Log ("Did I move?");
 			break;
 		}
 	}
