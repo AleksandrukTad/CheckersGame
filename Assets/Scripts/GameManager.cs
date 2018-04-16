@@ -166,7 +166,7 @@ public class GameManager : MonoBehaviour {
                         selectedPiece = null;
 
 						//sending move and queen info to server
-
+						SendData(startDrag, endDrag);
 						//
                         EndTurn();
                         return;
@@ -280,7 +280,6 @@ public class GameManager : MonoBehaviour {
 			else if (!pieces [i].isWhite)
 				hasBlack = true;
 		}
-		WhoWon (true);
 		if (!hasWhite)
 			Victory (false);
 		if (!hasBlack)
@@ -288,9 +287,9 @@ public class GameManager : MonoBehaviour {
 	}
 	private void Victory(bool isWhite){
 		if (isWhite)
-			Debug.Log ("White won!");
+			WhoWon (true);
 		else
-			Debug.Log ("Black won!");
+			WhoWon (true);
 		
 	}
 	private void WhoWon(bool isWhite)
